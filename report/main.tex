@@ -30,7 +30,6 @@
 \begin{abstract}
   English abstract goes here.
 
-  \blindtext
 \end{abstract}
 
 
@@ -55,31 +54,41 @@
 
 \chapter{Introduction}
 
+In the last couple of years machine learning and specifically deep learning have been applied successfully on several problems such as speech recognition, image recognition (Krizhevsky, Sutskever and Hinton, 2012) and even board games (Silver et al. 2018). One area which could make a lot of use of effective image recognition and analysis is medical diagnostics.
+
+Alzheimer’s Disease (AD) is a neurodegenerative disease that is the leading cause of dementia. Currently there is no cure for the disease, it can only be slowed down. Early detection is therefore very important, as it could significantly improve the prognosis for the patient.
+
+Two studies by Islam and Zhang (2017 and 2018) showed promising results for identifying Alzheimer’s Disease from MRI data and classify them based on the current disease stage. This was done using a version of a convolutional neural network (CNN) trained on the OASIS dataset (Marcus, D.S et al. 2010). While their model showed acceptable performance for identifying non-demented patients, its performance on classifying demented patients was significantly worse, which could be because of the limited number of samples. 
+
+
 We use the \emph{biblatex} package to handle our references.  We therefore use the
 command \texttt{parencite} to get a reference in parenthesis, like this
 \parencite{heisenberg2015}.  It is also possible to include the author
 as part of the sentence using \texttt{textcite}, like talking about
 the work of \textcite{einstein2016}.
 
-\Blindtext
-
 \section{Research Question}
-\blindtext
+This project aims to apply the model they developed to the larger OASIS-3 dataset (LaMontagne et al. 2018) and evaluate the resulting accuracy. We hope to see improved performance, especially in classifying the disease stage of demented patients. This would be interesting since it means that their model might be able to diagnose dementia accurately, if there existed a sufficiently large training dataset.
 
 \chapter{Background}
-\blindtext
 
 \chapter{Methods}
-\blindtext
+We will recreate the convolutional neural network (CNN) setup used in the study by Islam and Zhang, using the learning framework PyTorch. As mentioned earlier we will be using the OASIS-3 dataset, which contains data from over 2000 MRI sessions and 1000 patients tagged with their disease state. We have applied and received access to the dataset. 
+
+We will split the dataset into training, validation, and test sets, as done by Islam and Zhang. The CNN will never have seen the test set, and so it will be used for testing the accuracy. The study by Islam and Zhang resulted in a series of numerical values for accuracy, more specifically precision, recall, and f1 score. We will calculate the same values for our network trained on the larger dataset, and then compare our results with theirs. 
+
+Studies using the smaller OASIS dataset often use cross-validation, where the training and validation is repeated multiple times so that every part of the data is used as validation at some point. This might not be possible for us depending on the computation time needed to train on the larger dataset, but would increase confidence in our results.
+
+The CNN used by Islam and Zhang (2018) uses a densely connected architecture that seems identical to DenseNet (Huang et al. 2017). DenseNet has implementations for both Tensorflow and PyTorch. A dense architecture means that each layer in the network is not just connected to the previous layer, but also to every other layer that came before it. This can speed up training and reduce overfitting by shrinking the parameter space and providing more direct connections between different parts of the network.
+
+Islam and Zhang (2018) do not use the entire 3D images obtained from the MRI scans. Instead, they take three slices of the image along different planes and patch them together into an image, which is then used as input to the model. It would be interesting to see if 3D convolutions could be useful for this problem, this is something we will look into if we have time.
+
 
 \chapter{Results}
-\blindtext
 
 \chapter{Discussion}
-\blindtext
 
 \chapter{Conclusions}
-\blindtext
 
 % Print the bibliography (and make it appear in the table of contents)
 \printbibliography[heading=bibintoc]
