@@ -1,4 +1,4 @@
-\documentclass[swedish]{kththesis}
+\documentclass{kththesis}
 
 \usepackage{blindtext} % This is just to get some nonsense text in this template, can be safely removed
 
@@ -6,19 +6,18 @@
 \usepackage[style=numeric,sorting=none,backend=biber]{biblatex}
 \addbibresource{references.bib} % The file containing our references, in BibTeX format
 
-
-\title{Detta är den svenska titeln}
-\alttitle{This is the English translation of the title}
+\title{This is the English title}
+\alttitle{Detta är den svenska översättningen av titeln}
 \author{Osquar Student}
 \email{osquar@kth.se}
 \supervisor{Lotta Larsson}
 \examiner{Lennart Bladgren}
 \hostcompany{Företaget AB} % Remove this line if the project was not done at a host company
-\programme{Civilingenjör Datateknik}
-\school{Skolan för Elektroteknik och Datavetenskap}
+\programme{Master in Computer Science}
+\school{School of Electrical Engineering and Computer Science}
 \date{\today}
 
-% Uncomment the next line to include cover generated at https://intra.kth.se/kth-cover
+% Uncomment the next line to include cover generated at https://intra.kth.se/kth-cover?l=en
 % \kthcover{kth-cover.pdf}
 
 
@@ -30,17 +29,20 @@
 \titlepage
 
 \begin{abstract}
-  Svensk sammanfattning.
+  English abstract goes here.
 
   \blindtext
 \end{abstract}
 
 
-\begin{otherlanguage}{english}
+\begin{otherlanguage}{swedish}
   \begin{abstract}
-    English abstract.
-
-    \blindtext
+    Träutensilierna i ett tryckeri äro ingalunda en oviktig faktor,
+    för trevnadens, ordningens och ekonomiens upprätthållande, och
+    dock är det icke sällan som sorgliga erfarenheter göras på grund
+    af det oförstånd med hvilket kaster, formbräden och regaler
+    tillverkas och försäljas Kaster som äro dåligt hopkomna och af
+    otillräckligt.
   \end{abstract}
 \end{otherlanguage}
 
@@ -52,34 +54,32 @@
 \mainmatter
 
 
-\chapter{Introduktion}
+\chapter{Introduction}
 
-Vi använder paketet \emph{biblatex} för litteraturreferenser.  Därför
-anropar vi kommandot \texttt{parencite} för att få referenser inom
-parentes, så här \parencite{heisenberg2015}.  Det är också möjligt
-att använda författarens namn som en del av en mening genom att
-använda \texttt{textcite}, om vi t.ex.\ talar om en studie av
-\textcite{einstein2016}.
+We use the \emph{biblatex} package to handle our references.  We therefore use the
+command \texttt{parencite} to get a reference in parenthesis, like this
+\parencite{heisenberg2015}.  It is also possible to include the author
+as part of the sentence using \texttt{textcite}, like talking about
+the work of \textcite{einstein2016}.
 
 \Blindtext
 
-\section{Frågeställning}
+\section{Research Question}
 \blindtext
 
-
-\chapter{Bakgrund}
+\chapter{Background}
 \blindtext
 
-\chapter{Metodval}
+\chapter{Methods}
 \blindtext
 
-\chapter{Resultat}
+\chapter{Results}
 \blindtext
 
-\chapter{Analys}
+\chapter{Discussion}
 \blindtext
 
-\chapter{Slutsats}
+\chapter{Conclusions}
 \blindtext
 
 % Print the bibliography (and make it appear in the table of contents)
@@ -87,8 +87,9 @@ använda \texttt{textcite}, om vi t.ex.\ talar om en studie av
 
 \appendix
 
-\chapter{Extra Material som Bilaga}
+\chapter{Something Extra}
 
+% Tailmatter inserts the back cover page (if enabled)
 \tailmatter
 
 \end{document}
