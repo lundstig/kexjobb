@@ -1,7 +1,5 @@
 \documentclass{kththesis}
 
-\usepackage{blindtext} % This is just to get some nonsense text in this template, can be safely removed
-
 \usepackage{csquotes} % Recommended by biblatex
 \usepackage[style=numeric,sorting=none,backend=biber]{biblatex}
 \addbibresource{references.bib} % The file containing our references, in BibTeX format
@@ -29,6 +27,7 @@
 
 \begin{abstract}
   English abstract goes here.
+  $$\int \gamma$$
 
 \end{abstract}
 
@@ -51,7 +50,6 @@
 % Mainmatter is where the actual contents of the thesis goes
 \mainmatter
 
-
 \chapter{Introduction}
 
 In the last couple of years machine learning and specifically deep learning have been applied successfully on several problems such as speech recognition, image recognition \parencite{krizhevsky2012imagenet} and even board games \parencite{silver2018general}. One area which could make a lot of use of effective image recognition and analysis is medical diagnostics.
@@ -71,6 +69,18 @@ the work of \textcite{einstein2016}.
 This project aims to apply the model they developed to the larger OASIS-3 dataset \parencite{lamontagne2018oasis} and evaluate the resulting accuracy. We hope to see improved performance, especially in classifying the disease stage of demented patients. This would be interesting since it means that their model might be able to diagnose dementia accurately, if there existed a sufficiently large training dataset.
 
 \chapter{Background}
+
+\section{Alzheimer's Disease}
+TODO: Karl
+\subsection{MRI Scans}
+
+\section{Machine Learning}
+TODO: Alfred
+\subsection{Neural Networks}
+
+\subsection{Convolutional Neural Networks}
+\subsection{Densely Connected CNNs}
+
 
 \chapter{Methods}
 We will recreate the convolutional neural network (CNN) setup used in the study by Islam and Zhang, using the learning framework PyTorch. As mentioned earlier we will be using the OASIS-3 dataset, which contains data from over 2000 MRI sessions and 1000 patients tagged with their disease state. We have applied and received access to the dataset. 
