@@ -6,8 +6,8 @@
 
 \title{Evaluating a deep learning method for classifying Alzheimer's disease}
 \alttitle{Utvärdering av en deep learning-metod för att klassifiera Alzheimers sjukdom}
-\author{Alfred Andersson \& Karl Lundstig}
-\email{alfredan@kth.se, lundsti@kth.se}
+\author{Karl Lundstig}
+\email{lundsti@kth.se}
 \supervisor{Jeanette Hällgren Kotaleski}
 \examiner{Örjan Ekeberg}
 \programme{Degree Project in Computer Science, DD142X}
@@ -58,24 +58,15 @@ Alzheimer’s Disease (AD) is a neurodegenerative disease that is the leading ca
 
 Two studies by \textcite{islam2017novel, islam2018early} showed promising results for identifying Alzheimer’s Disease from MRI data and classify them based on the current disease stage. This was done using a version of a convolutional neural network (CNN) trained on the OASIS dataset \parencite{marcus2010open}. While their model showed acceptable performance for identifying non-demented patients, its performance on classifying demented patients was significantly worse, which could be because of the limited number of samples. 
 
-
-We use the \emph{biblatex} package to handle our references.  We therefore use the
-command \texttt{parencite} to get a reference in parenthesis, like this
-\parencite{heisenberg2015}.  It is also possible to include the author
-as part of the sentence using \texttt{textcite}, like talking about
-the work of \textcite{einstein2016}.
-
 \section{Research Question}
-This project aims to apply the model they developed to the larger OASIS-3 dataset \parencite{lamontagne2018oasis} and evaluate the resulting accuracy. We hope to see improved performance, especially in classifying the disease stage of demented patients. This would be interesting since it means that their model might be able to diagnose dementia accurately, if there existed a sufficiently large training dataset.
+This project aims to apply the model Islam and Zhang developed to the larger OASIS-3 dataset \parencite{lamontagne2018oasis} and evaluate the resulting accuracy. We hope to see improved performance, especially in classifying the disease stage of demented patients. This would be interesting since it means that their model might be able to diagnose dementia accurately, if there existed a sufficiently large training dataset.
 
 \chapter{Background}
 
 \section{Alzheimer's Disease}
-TODO: Karl
 \subsection{MRI Scans}
 
 \section{Machine Learning}
-TODO: Alfred
 \subsection{Neural Networks}
 
 \subsection{Convolutional Neural Networks}
@@ -97,6 +88,8 @@ The CNN used by \textcite{islam2018early} uses a densely connected architecture 
 \chapter{Results}
 
 \chapter{Discussion}
+\subsection{Method}
+\subsection{Results}
 
 \chapter{Conclusions}
 
