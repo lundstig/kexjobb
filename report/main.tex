@@ -52,19 +52,24 @@
 
 \chapter{Introduction}
 
-In the last couple of years machine learning and specifically deep learning have been applied successfully on several problems such as speech recognition, image recognition \parencite{krizhevsky2012imagenet} and even board games \parencite{silver2018general}. One area which could make a lot of use of effective image recognition and analysis is medical diagnostics.
+In the last couple of years machine learning and specifically deep learning have been applied successfully on several problems such as speech recognition, image recognition \parencite{krizhevsky2012imagenet}, and even board games \parencite{silver2018general}. One area which could benefit greatly from effective image recognition and analysis is medical diagnostics.
 
-Alzheimer’s Disease (AD) is a neurodegenerative disease that is the leading cause of dementia. Currently there is no cure for the disease, it can only be slowed down. Early detection is therefore very important, as it could significantly improve the prognosis for the patient.
+Alzheimer’s Disease (AD) is a neurodegenerative disease that is the leading cause of dementia. Currently there is no cure for the disease, it can only be slowed down. Early detection is therefore very important as it could significantly improve the prognosis for a patient.
 
-Two studies by \textcite{islam2017novel, islam2018early} showed promising results for identifying Alzheimer’s Disease from MRI data and classify them based on the current disease stage. This was done using a version of a convolutional neural network (CNN) trained on the OASIS dataset \parencite{marcus2010open}. While their model showed acceptable performance for identifying non-demented patients, its performance on classifying demented patients was significantly worse, which could be because of the limited number of samples. 
+Two studies by \textcite{islam2017novel, islam2018early} showed promising results for identifying and classifying Alzheimer’s Disease from MRI data. This was done using a version of a convolutional neural network (CNN) trained on the OASIS dataset \parencite{marcus2010open}. While their model showed acceptable performance for identifying non-demented patients, its performance on classifying demented patients was significantly worse, which could be because of the limited number of samples. 
 
 \section{Research Question}
-This project aims to apply the model Islam and Zhang developed to the larger OASIS-3 dataset \parencite{lamontagne2018oasis} and evaluate the resulting accuracy. We hope to see improved performance, especially in classifying the disease stage of demented patients. This would be interesting since it means that their model might be able to diagnose dementia accurately, if there existed a sufficiently large training dataset.
+This project aims to apply the model Islam and Zhang developed to the larger OASIS-3 dataset \parencite{lamontagne2018oasis} and evaluate the resulting accuracy. We hope to see improved performance, especially in classifying the disease stage of demented patients. This would be interesting since it means that the model they developed might be able to diagnose dementia accurately, if there existed a sufficiently large training dataset.
 
 \chapter{Background}
 
 \section{Alzheimer's Disease}
+
+There
+
 \subsection{MRI Scans}
+
+\subsection{Global Deterioration Scale}
 
 \section{Machine Learning}
 \subsection{Neural Networks}
@@ -74,9 +79,9 @@ This project aims to apply the model Islam and Zhang developed to the larger OAS
 
 
 \chapter{Methods}
-We will recreate the convolutional neural network (CNN) setup used in the study by Islam and Zhang, using the learning framework PyTorch. As mentioned earlier we will be using the OASIS-3 dataset, which contains data from over 2000 MRI sessions and 1000 patients tagged with their disease state. We have applied and received access to the dataset. 
+We will recreate the convolutional neural network (CNN) setup used in the study by Islam and Zhang, using the machine learning framework Keras. The network will be trained and evaluated on the OASIS-3 dataset. This dataset contains data from over 2000 MRI sessions and 1000 patients, as well as medical evaluations of their disease state. OASIS-3 was a longitudinal study, which means that the imaging and evaluation of every patient was performed over a large span of time.
 
-We will split the dataset into training, validation, and test sets, as done by Islam and Zhang. The CNN will never have seen the test set, and so it will be used for testing the accuracy. The study by Islam and Zhang resulted in a series of numerical values for accuracy, more specifically precision, recall, and f1 score. We will calculate the same values for our network trained on the larger dataset, and then compare our results with theirs. 
+The dataset will be split into training, validation, and test sets, as done by Islam and Zhang. The CNN will never have seen the test set, and so it will be used for testing the accuracy. The study by Islam and Zhang resulted in a series of numerical values for accuracy, more specifically precision, recall, and f1 score. We will calculate the same values for our network trained on the larger dataset, and then compare our results with theirs. 
 
 Studies using the smaller OASIS dataset often use cross-validation, where the training and validation is repeated multiple times so that every part of the data is used as validation at some point. This might not be possible for us depending on the computation time needed to train on the larger dataset, but would increase confidence in our results.
 
