@@ -1,0 +1,20 @@
+Keras with PlaidML (to support AMD gpu)
+
+Done:
+* Install tools
+* Find and download SDG score
+* Check which images are missing
+Todo:
+* Find out how to read images, and export them
+* Find corrupted images
+* See if I can train any network
+* Make sure all images are valid
+* Test data extension, mirror etc?
+
+Some pictures are missing data
+Hm, some of the pictures seems to be wrongly rotated. Use PatientPosition?
+HFP Head First-Prone
+HFS Head First-Supine
+If patientposition doesn't exist, it seems to be rotated. Example: 300059
+
+Hmm, behöver jag hitta bilder skullstripping? Finns fressurfer processed, men verkar jobbigt...
