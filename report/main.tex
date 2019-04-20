@@ -54,7 +54,7 @@
 
 In the last couple of years machine learning and specifically deep learning have been applied successfully on several problems such as speech recognition, image recognition \parencite{krizhevsky2012imagenet}, and even board games \parencite{silver2018general}. One area which could benefit greatly from effective image recognition and analysis is medical diagnostics.
 
-Alzheimer’s Disease (AD) is a neurodegenerative disease that is the leading cause of dementia. Currently there is no cure for the disease, it can only be slowed down. Early detection is therefore very important as it could significantly improve the prognosis for a patient.
+Alzheimer’s Disease (AD) is a neurodegenerative disease that is the leading cause of dementia. Currently there is no cure for the disease, it can only be slowed down <DONT THINK SO>. Early detection is therefore very important as it could significantly improve the prognosis for a patient.
 
 Two studies by \textcite{islam2017novel, islam2018early} showed promising results for identifying and classifying Alzheimer’s Disease from MRI data. This was done using a version of a convolutional neural network (CNN) trained on the OASIS dataset \parencite{marcus2010open}. While their model showed acceptable performance for identifying non-demented patients, its performance on classifying demented patients was significantly worse, which could be because of the limited number of samples. 
 
@@ -65,9 +65,17 @@ This project aims to apply the model Islam and Zhang developed to the larger OAS
 
 \section{Alzheimer's Disease}
 
-There
+Dementia is a group of symptoms that may have many different causes. Alzheimer's disease is a degenerative brain disease, estimated to be the cause of 60\% to 80\% of dementia cases. In half of these cases Alzheimer's is the only cause, while many other also have evidence of other dementia causing changes\cite{factsfigures2018}.
 
-\subsection{MRI Scans}
+Early (and accurate) diagnosis of Alzheimer's disease has several benefits. Those who do not have Alzheimer's but are diagnosed with mild cognitive impairment, might after testing realize that they're suffering from some other, treatable condition. There are also medical and social benefits to get an Alzheimer's diagnosis early. Neither a curing nor a slowing treatment exist, but individuals can still take measures to retain ther cognitive function for as long as possible. Aerobic exercise, mental activity and social engagement may help delay cognitive decline, while medication and other intervention can help with managing symptoms. An early diagnosis can also help reduce anxiety by giving noticed symptoms a name, for both affected individuals and their family members. Finally, early diagnosis gives individuals time to make plans for the future while still having good cognitive function\cite[p. 406-409]{factsfigures2018}.
+
+\subsection{Symptoms}
+Individuals with Alzheimer's disease can experience multiple and varying symptoms, which change over several years\cite{factsfigures2018}.
+
+\subsection{Brain changes}
+The abnormal accumulation of two proteins (what is called beta-amyloid plaques and tau tangles) inside the brain is one of several brain changes associated with Alzheimer's disease. These proteins interfer with neuron communication and nutrient transportation, while also triggering inflammation. Brain shrinkage, or \textit{atrophy,} eventually occurs because of cell loss. These changes may start as early as 20 years or more before symptoms appear\cite{factsfigures2018}.
+
+Atrophy occurs in a relatively late disease stage, when neurodegeneration has started to occur, but can be measured using MRI imaging and is an established predictor of an individual progressing from mild cognitive impairement to Alzheimer's disease. In addition there seems to be a direct relationship between atrophy severity and time-to-dementia. Brain atrophy is, however, not a unique sign of Alzheimer's but a measure of neural degeneration in general, which might be caused by other conditions\cite{jack2010brain}.
 
 \subsection{Global Deterioration Scale}
 
@@ -77,6 +85,7 @@ There
 \subsection{Convolutional Neural Networks}
 \subsection{Densely Connected CNNs}
 
+\section{Previous Work}
 
 \chapter{Methods}
 We will recreate the convolutional neural network (CNN) setup used in the study by Islam and Zhang, using the machine learning framework Keras. The network will be trained and evaluated on the OASIS-3 dataset. This dataset contains data from over 2000 MRI sessions and 1000 patients, as well as medical evaluations of their disease state. OASIS-3 was a longitudinal study, which means that the imaging and evaluation of every patient was performed over a large span of time.
@@ -89,6 +98,8 @@ The CNN used by \textcite{islam2018early} uses a densely connected architecture 
 
 \textcite{islam2018early} do not use the entire 3D images obtained from the MRI scans. Instead, they take three slices of the image along different planes and patch them together into an image, which is then used as input to the model. It would be interesting to see if 3D convolutions could be useful for this problem, this is something we will look into if we have time.
 
+\section{Oklart var}
+T1-weighted structural MRI.
 
 \chapter{Results}
 
