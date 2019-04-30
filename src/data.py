@@ -4,6 +4,8 @@ import os
 import parsing
 import sys
 import traceback
+from math import inf
+from bisect import bisect_left
 
 root = "/mnt/data/oasis-3/"
 
@@ -14,8 +16,13 @@ class Subject:
     def __init__(self, subject_id, experiments=[]):
         self.subject_id = subject_id
         self.experiments = experiments
-        self.gds_data = [GDSData.load(gds_path) for gds_path in self.get_gds_paths()]
+        gds_data_with_nones = (
+            GDSData.load(gds_path) for gds_path in self.get_gds_paths()
+        )
+        self.gds_data = list(filter(None, gds_data_with_nones))
         self.mri_data = [MRIData.load(mri_path) for mri_path in self.get_mri_paths()]
+        self.gds_days = sorted(gds.day for gds in self.gds_data)
+        self.mri_days = sorted(mri.day for mri in self.mri_data)
 
     def build_path(self, filename):
         return root + self.subject_id + "/" + filename
@@ -34,8 +41,34 @@ class Subject:
             if "_USDb6" in experiment
         ]
 
-    def get_mri_gds_delays():
-        return None
+    def get_mri_gds_offset_indices(self):
+        pre_indices = [
+            bisect_left(self.gds_days, mri_day) - 1 for mri_day in self.mri_days
+        ]
+        post_indices = [
+            bisect_left(self.gds_days, mri_day) for mri_day in self.mri_days
+        ]
+        return pre_indices, post_indices
+
+    def get_mri_gds_offsets(self):
+        pre_indices, post_indices = self.get_mri_gds_offset_indices()
+        pre = [
+            self.mri_days[mri] - self.gds_days[i]
+            if 0 <= i < len(self.gds_days)
+            else inf
+            for mri, i in enumerate(pre_indices)
+        ]
+        post = [
+            self.gds_days[i] - self.mri_days[mri]
+            if 0 <= i < len(self.gds_days)
+            else inf
+            for mri, i in enumerate(post_indices)
+        ]
+        return pre, post
+
+    def get_min_offsets(self):
+        pre, post = self.get_mri_gds_offsets()
+        return [min(a, b) for a, b in zip(pre, post)]
 
     @classmethod
     def load(cls, subject_id):
@@ -125,8 +158,7 @@ class MRIData:
                         except OSError as e:
                             logging.error(f"Missing file {nifti_file}")
                             missing_sessions.add(session_id)
-
-            return cls(filenames, day)
+            return cls(filenames, int(day))
         except:
             logging.warning(f"Could not read MRI metadata for {path}")
             traceback.print_exception()
