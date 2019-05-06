@@ -2,6 +2,7 @@ from math import inf
 from numpy import percentile
 from statistics import *
 import logging
+import matplotlib.pyplot as plt
 
 
 def print_offset_stats(subjects):
@@ -23,3 +24,9 @@ def print_offset_stats(subjects):
     logging.info(f"GDR tag offset median: {med}")
     logging.info(f"GDR tag offset 90 percentile: {p90}")
     logging.info(f"GDR tag offset 99 percentile: {p99}")
+    generate_offset_plot(min_offsets)
+
+def generate_offset_plot(min_offsets):
+    plt.hist(min_offsets, bins=50, range=(0, 1500), label="Time between MRI images and the closest GDR assessments")
+    plt.savefig('../report/img/mri_gdi_offset.pdf', transparent=True)
+
