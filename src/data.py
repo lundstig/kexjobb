@@ -88,7 +88,7 @@ def load_subjects():
     logging.info(f"Found {total_mri_sessions} MRI sessions")
     logging.info(f"Found {total_gds_evaluations} GDS evaluations")
 
-    if len(missing_sessions) > 0:
+    if missing_sessions:
         with open("missing_sessions.csv", "w") as f:
             for line in missing_sessions:
                 f.write(line + "\n")

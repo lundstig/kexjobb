@@ -12,5 +12,5 @@ gds_paths = [path for subject in subjects for path in subject.get_gds_paths()]
 
 analysis.print_offset_stats(subjects)
 
-export.export_all(subjects, '/mnt/data/oasis_out/')
+export.export_all(subjects, "/mnt/data/oasis_out/")
 # export.export_subject(subjects[0], '/mnt/data/oasis_out/')
