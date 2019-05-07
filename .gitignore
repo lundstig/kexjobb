@@ -1,6 +1,7 @@
 data/
 report/img/
 refs/
+.vscode/
 main.pdf
 __pycache__
 
