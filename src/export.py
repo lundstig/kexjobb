@@ -27,10 +27,12 @@ def export_subject(subject, folder):
         return
     for mri_index, mri_data in enumerate(subject.mri_data):
         gds = calc_gds(mri_data, gds_indices[mri_index], subject.gds_data)
-        print(gds)
         gds = int(round(gds))
+        if gds == -1:
+            logging.warning(f"Runs from {subject.subject_id} d{mri_data.day} has no valid GDS data")
+            continue
         for i, filename in enumerate(mri_data.filenames):
-            path = folder + f"{gds}/{subject.subject_id}_{i}.png"
+            path = folder + f"{gds}/{subject.subject_id}_{mri_index}_run{i}.png"
             if not os.path.isfile(path):
                 img = load_image(filename + ".nii.gz")
                 pilutil.imsave(path, get_single_plane(img))
@@ -38,18 +40,18 @@ def export_subject(subject, folder):
 
 def calc_gds(mri_data, gds_indices, gds_data):
     a, b = gds_indices
-    if a == -1:
+    if not 0 <= a < len(gds_data):
         a, b = b, a
-    if b == -1:
-        print("returned single")
-        return gds_data[a].gds
-    else:
+    if 0 <= b < len(gds_data):
         t_a = gds_data[a].day
         gds_a = gds_data[a].gds
         t_b = gds_data[b].day
         gds_b = gds_data[b].gds
-        print("interpolated")
         return interp(mri_data.day, [t_a, t_b], [gds_a, gds_b])
+    elif 0 <= a < len(gds_data):
+        return gds_data[a].gds
+    else:
+        return -1
 
 
 def get_planes(img):
