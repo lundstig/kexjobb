@@ -62,6 +62,9 @@ Two studies by \textcite{islam2017novel, islam2018early} showed promising result
 \section{Research Question}
 This project aims to apply the model Islam and Zhang developed to the larger OASIS-3 dataset \parencite{oasis3} and evaluate the resulting accuracy. We hope to see improved performance, especially in classifying the disease stage of demented patients. This would be interesting since it means that the model they developed might be able to diagnose dementia accurately, if there existed a sufficiently large training dataset.
 
+\section{Acknowledgments}
+Data were provided by OASIS-3: Principal Investigators: T. Benzinger, D. Marcus, J. Morris; NIH P50AG00561, P30NS09857781, P01AG026276, P01AG003991, R01AG043434, UL1TR000448, R01EB009352. AV-45 doses were provided by Avid Radiopharmaceuticals, a wholly owned subsidiary of Eli Lilly.
+
 \chapter{Background}
 
 \section{Alzheimer's Disease}
@@ -78,7 +81,8 @@ The abnormal accumulation of two proteins (what is called beta-amyloid plaques a
 
 Atrophy occurs in a relatively late disease stage, when neurodegeneration has started to occur, but can be detected using MRI imaging and is an established predictor of an individual progressing from mild cognitive impairement to Alzheimer's disease. In addition there seems to be a direct relationship between atrophy severity and time-to-dementia. Brain atrophy is, however, not a unique sign of Alzheimer's but a measure of neural degeneration in general, which might be caused by other conditions~\cite{jack2010brain}.
 
-\subsection{Global Deterioration Scale}
+\subsection{Clinical Dementia Rating}
+Clinical Dementia Rating (CDR) is a mesure of
 
 \section{Machine Learning}
 \subsection{Neural Networks}
@@ -92,22 +96,23 @@ Atrophy occurs in a relatively late disease stage, when neurodegeneration has st
 
 I will in this study recreate the convolutional neural network used in the second study by Islam and Zhang
 
-OASIS-3 is a longitudinal neuroimaging dataset, with data collected over the course of 30 years from 1098 participants in various projects. Of these participants 809 were cognitively normal adults, while 489 were at various stages of cognitive decline. Accompanying the neural imaging is (among other things) clinical assessments of cognitive function~\cite{oasis3}. I will use the T1-weighted brain scans and evaluations using the GDS system. The dataset contains 2168 T1-weighted MRI images and 4089 different GDS evaluations.
+OASIS-3 is a longitudinal neuroimaging dataset, with data collected over the course of 30 years from 1098 participants in various projects. Of these participants 809 were cognitively normal adults, while 489 were at various stages of cognitive decline. Accompanying the neural imaging is (among other things) clinical assessments of cognitive function~\cite{oasis3}. I will use the T1-weighted brain scans and evaluations using the CDR system. The dataset in total contains 3393 T1-weighted MRI images and 4089 different CDR evaluations.
 
-I will use the assessment of the subjects GDR score to label every MRI image with the stage of dementia. However, since OASIS-3 is a longitudinal study, the MRI scans and the clinical assessments were not performed at the same time. In fact, the time between MRI scans and the closest GDR assessment can be quite large ($\mu=218$, $\sigma=296$). The distribution is shown in Figure~\ref{fig:mri_gdi_offset}. For most of the data the time from an MRI scan to the closest GDR assessment is less than 200 days, while for some images the delay is much higher.
+\section{Labeling}
+I will use the assessment of the subjects CDR score to label every MRI image with the stage of dementia. However, since OASIS-3 is a longitudinal study, the MRI scans and the clinical assessments were not performed at the same time. In fact, the time between MRI scans and the closest CDR assessment can be relatively large ($\mu=116$, $\sigma=107$). The distribution is shown in Figure~\ref{fig:mri_cdr_offset}. For most of the data the time from an MRI scan to the closest CDR assessment is less than 200 days, while for some images the delay can be several hundred days.
 
-To try to get reasonable GDR labels even when the time offsets are high I will use a linear interpolation of the two closest GDR assessments and the time of the MRI scan, when this is possible. If the MRI scan was done either before or after all of this subjects' GDR assessments I will simply use the closest one.
+To try to get reasonable CDR labels even when the time offsets are high I will use a linear interpolation of the two closest CDR assessments and the time of the MRI scan, when this is possible. If the MRI scan was done either before or after all of this subjects' CDR assessments I will simply use the closest one.
 
-88 of the MRI pictures were done on subjects that did not have any GDS assessment data at all, these will not be used in this study.
-
-During the preprocessing step the three image planes are extracted from each MRI scan. For simplicity the planes chosen are simply the middle one for each axis, and the raw intensity values from each scan are flattened into the normal black/white range of PNG images.
 \begin{figure}
-  \includegraphics[width=100mm]{img/mri_gdi_offset.pdf}
-  \caption{Histogram of time between MRI scans and the closest GDR assessment (in days).}
-  \label{fig:mri_gdi_offset}
+  \includegraphics[width=100mm]{img/mri_cdr_offset.pdf}
+  \caption{Histogram of time between MRI scans and the closest CDR assessment (in days).}
+  \label{fig:mri_cdr_offset}
 \end{figure}
 
-\subsection{Old text}
+\section{Image Extraction}
+During the preprocessing step the three image planes are extracted from each MRI scan. For simplicity the planes chosen are simply the middle one for each axis, and the raw intensity values from each scan are flattened into the normal black/white range of PNG images.
+
+\section{Old text}
 We will recreate the convolutional neural network (CNN) setup used in the study by Islam and Zhang, using the machine learning framework Keras. The network will be trained and evaluated on the OASIS-3 dataset. This dataset contains data from over 2000 MRI sessions and 1000 patients, as well as medical evaluations of their disease state. OASIS-3 was a longitudinal study, which means that the imaging and evaluation of every patient was performed over a large span of time.
 
 The dataset will be split into training, validation, and test sets, as done by Islam and Zhang. The CNN will never have seen the test set, and so it will be used for testing the accuracy. The study by Islam and Zhang resulted in a series of numerical values for accuracy, more specifically precision, recall, and f1 score. We will calculate the same values for our network trained on the larger dataset, and then compare our results with theirs. 
@@ -131,7 +136,6 @@ The CNN used by \textcite{islam2018early} uses a densely connected architecture 
 
 \appendix
 
-\chapter{Something Extra}
 
 % Tailmatter inserts the back cover page (if enabled)
 \tailmatter

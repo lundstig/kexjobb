@@ -30,8 +30,8 @@ def print_offset_stats(subjects):
 def generate_offset_plot(min_offsets):
     plt.hist(
         min_offsets,
-        bins=50,
-        range=(0, 1500),
+        bins=30,
+        range=(0, 600),
         label="Time between MRI images and the closest GDR assessments",
     )
-    plt.savefig("../report/img/mri_gdi_offset.pdf", transparent=True)
+    plt.savefig("../report/img/mri_cdr_offset.pdf", transparent=True)

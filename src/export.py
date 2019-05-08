@@ -1,6 +1,6 @@
 import os
 import logging
-from numpy import interp
+import numpy as np
 import nibabel as nib
 import progress.bar
 import scipy.misc.pilutil as pilutil
@@ -21,38 +21,41 @@ def export_all(subjects, folder):
 
 def export_subject(subject, folder):
     logging.debug(f"Exporting subject {subject.subject_id}")
-    gds_indices = list(zip(*subject.get_mri_gds_offset_indices()))
-    if gds_indices.count((-1, -1)) == len(gds_indices):
-        logging.warning(f"Subject {subject.subject} has no GDR data, skipping")
-        return
+    cdr_indices = list(zip(*subject.get_mri_cdr_offset_indices()))
+    if cdr_indices.count((-1, -1)) == len(cdr_indices):
+        logging.warning(f"Subject {subject.subject} has no CDR data, skipping")
     for mri_index, mri_data in enumerate(subject.mri_data):
-        gds = calc_gds(mri_data, gds_indices[mri_index], subject.gds_data)
-        gds = int(round(gds))
-        if gds == -1:
-            logging.warning(f"Runs from {subject.subject_id} d{mri_data.day} has no valid GDS data")
+        cdr = calc_cdr(mri_data, cdr_indices[mri_index], subject.cdr_data)
+        if cdr == -1:
+            logging.warning(f"Runs from {subject.subject_id} d{mri_data.day} has no valid CDR data")
             continue
         for i, filename in enumerate(mri_data.filenames):
-            path = folder + f"{gds}/{subject.subject_id}_{mri_index}_run{i}.png"
+            path = folder + f"{cdr}/{subject.subject_id}_{mri_index}_run{i}.png"
             if not os.path.isfile(path):
                 img = load_image(filename + ".nii.gz")
                 pilutil.imsave(path, get_single_plane(img))
 
 
-def calc_gds(mri_data, gds_indices, gds_data):
-    a, b = gds_indices
-    if not 0 <= a < len(gds_data):
+def calc_cdr(mri_data, cdr_indices, cdr_data):
+    a, b = cdr_indices
+    if not 0 <= a < len(cdr_data):
         a, b = b, a
-    if 0 <= b < len(gds_data):
-        t_a = gds_data[a].day
-        gds_a = gds_data[a].gds
-        t_b = gds_data[b].day
-        gds_b = gds_data[b].gds
-        return interp(mri_data.day, [t_a, t_b], [gds_a, gds_b])
-    elif 0 <= a < len(gds_data):
-        return gds_data[a].gds
+    if 0 <= b < len(cdr_data):
+        t_a = cdr_data[a].day
+        cdr_a = cdr_data[a].cdr
+        t_b = cdr_data[b].day
+        cdr_b = cdr_data[b].cdr
+        exact_cdr = np.interp(mri_data.day, [t_a, t_b], [cdr_a, cdr_b])
+        return find_nearest([0, 0.5, 1.0, 2.0], exact_cdr)
+    elif 0 <= a < len(cdr_data):
+        return cdr_data[a].cdr
     else:
         return -1
 
+def find_nearest(array, value):
+    array = np.asarray(array)
+    idx = (np.abs(array - value)).argmin()
+    return array[idx]
 
 def get_planes(img):
     a, b, c = img.shape
