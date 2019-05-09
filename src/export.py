@@ -33,7 +33,11 @@ def export_subject(subject, folder):
             path = folder + f"{cdr}/{subject.subject_id}_{mri_index}_run{i}.png"
             if not os.path.isfile(path):
                 img = load_image(filename + ".nii.gz")
-                pilutil.imsave(path, get_single_plane(img))
+                plane = get_single_plane(img)
+                if plane is None:
+                    logging.warning(f"Skipping exporting wrongly rotated image {path}")
+                else:
+                    pilutil.imsave(path, get_single_plane(img))
 
 
 def calc_cdr(mri_data, cdr_indices, cdr_data):
@@ -67,7 +71,11 @@ def get_planes(img):
 
 def get_single_plane(img):
     a, b, c = img.shape
-    size = min(a, b)
+    max_size = min(a, b)
+    if max_size == 256:
+        # Wrong orientation, somehow. TODO: Fix instead of ignore
+        return None
+    size = min(max_size, 112)
     a_min, a_max = get_center_dims(a, size)
     b_min, b_max = get_center_dims(b, size)
     return img.dataobj[a_min:a_max, b_min:b_max, c // 2]
