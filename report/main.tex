@@ -3,7 +3,11 @@
 \usepackage{amsmath}
 \usepackage{csquotes} % Recommended by biblatex
 \usepackage[style=numeric,sorting=none,backend=biber]{biblatex}
+\usepackage{caption}
+\usepackage{booktabs}
 \addbibresource{references.bib} % The file containing our references, in BibTeX format
+\renewcommand{\arraystretch}{1.2}
+\captionsetup[table]{skip=10pt}
 
 \title{Evaluating a deep learning method for classifying Alzheimer's disease}
 \alttitle{Utvärdering av en deep learning-metod för att klassifiera Alzheimers sjukdom}
@@ -104,13 +108,35 @@ I will use the assessment of the subjects CDR score to label every MRI image wit
 To try to get reasonable CDR labels even when the time offsets are high I will use a linear interpolation of the two closest CDR assessments and the time of the MRI scan, when this is possible. If the MRI scan was done either before or after all of this subjects' CDR assessments I will simply use the closest one.
 
 \begin{figure}
-  \includegraphics[width=100mm]{img/mri_cdr_offset.pdf}
-  \caption{Histogram of time between MRI scans and the closest CDR assessment (in days).}
-  \label{fig:mri_cdr_offset}
+  \begin{center}
+    \includegraphics[width=100mm]{img/mri_cdr_offset.pdf}
+    \caption{Histogram of time between MRI scans and the closest CDR assessment (in days).}
+    \label{fig:mri_cdr_offset}
+  \end{center}
 \end{figure}
 
 \section{Image Extraction}
 During the preprocessing step the three image planes are extracted from each MRI scan. For simplicity the planes chosen are simply the middle one for each axis, and the raw intensity values from each scan are flattened into the normal black/white range of PNG images.
+
+Some scans are rotated the wrong way, even after realigning the images when loading. These images are simply skipped for now.
+
+\section{Dataset contents}
+The dataset in total contains 2782 images (ignoring the wrongly rotated ones). Of these images 10~\% were selected to be used as validation data, while the other 90~\% will be used to train the network. Just as in the paper by \textcite{islam2018early} I will use the CDR scores to divide the images into four classes: \textit{non-demented}, \textit{very mild dementia}, \textit{mild dementia}, and \textit{moderate dementia}. These classes are not equally represented in the dataset, with the more serious dementia cases being much less frequent. The total count of each case is shown in Table~\ref{tab:dataset_contents}, with the count in training and verification broken out.
+
+\begin{table}[h]
+  
+  \begin{center}
+    \caption{Count of images belonging to each class in the dataset.\label{tab:dataset_contents}}
+    \begin{tabular}{r|cccc}
+      \textbf{CDR Class} & \textbf{Total} & \textbf{Training set} & \textbf{Verification set} \\
+      \toprule
+      Non-demented (0.0) & 2163 & 1787 & 376 \\
+      Very mild (0.5) & 443 & 357 & 86 \\
+      Mild (1.0) & 153 & 120 & 33 \\
+      Moderate (2.0) & 23 & 18 & 5 \\
+    \end{tabular}
+  \end{center}
+\end{table}
 
 \section{Old text}
 We will recreate the convolutional neural network (CNN) setup used in the study by Islam and Zhang, using the machine learning framework Keras. The network will be trained and evaluated on the OASIS-3 dataset. This dataset contains data from over 2000 MRI sessions and 1000 patients, as well as medical evaluations of their disease state. OASIS-3 was a longitudinal study, which means that the imaging and evaluation of every patient was performed over a large span of time.
@@ -124,8 +150,11 @@ The CNN used by \textcite{islam2018early} uses a densely connected architecture 
 \textcite{islam2018early} do not use the entire 3D images obtained from the MRI scans. Instead, they take three slices of the image along different planes and patch them together into an image, which is then used as input to the model. It would be interesting to see if 3D convolutions could be useful for this problem, this is something we will look into if we have time.
 
 \chapter{Results}
+The learning rate of the Adam optimizer was found to be very important for good results. The default learning rate of $0.001$ appears to be to large, and the result was the network not improving. A lower rate of $10^{-4}$ resulted in more and faster improvement during training.
 
 \chapter{Discussion}
+Just as in the study by \textcite{islam2018early} the low count of demented samples is an issue. Thanks to OASIS-3 being a much larger dataset than the original OASIS this is not too large of a problem during training, but the low count is noticible during validation, with single-digit numbers for the rarest class (\textit{moderate dementia}). This gives very rough models for the accuracy of the model, and it might be useful to increase the ratio of validation to training data.
+
 \subsection{Method}
 \subsection{Results}
 
