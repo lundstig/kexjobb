@@ -1,16 +1,17 @@
 \documentclass{kththesis}
 
 \usepackage{amsmath}
-\usepackage{csquotes} % Recommended by biblatex
 \usepackage[style=numeric,sorting=none,backend=biber]{biblatex}
-\usepackage{caption}
 \usepackage{booktabs}
+\usepackage{caption}
+\usepackage{csquotes} % Recommended by biblatex
+\usepackage{subcaption}
 \addbibresource{references.bib} % The file containing our references, in BibTeX format
 \renewcommand{\arraystretch}{1.2}
 \captionsetup[table]{skip=10pt}
 
-\title{Evaluating a deep learning method for classifying Alzheimer's disease}
-\alttitle{Utvärdering av en deep learning-metod för att klassifiera Alzheimers sjukdom}
+\title{Evaluating a simple convolutional neural network for classifying Alzheimer's disease}
+\alttitle{Utvärdering av ett enkelt CNN-nätverk för klassifiering av Alzheimers sjukdom}
 \author{Karl Lundstig}
 \email{lundsti@kth.se}
 \supervisor{Jeanette Hällgren Kotaleski}
@@ -88,16 +89,17 @@ The abnormal accumulation of two proteins (what is called beta-amyloid plaques a
 
 Brain atrophy occurs in a relatively late disease stage, when neurodegeneration has started to occur. This atrophy can be detected and measured using MRI imaging, and is a medically established predictor of an individual progressing from mild cognitive impairement to Alzheimer's disease. In addition there seems to be a direct relationship between the severity of the atrophy and time-to-dementia. Brain atrophy is, however, not a unique sign of Alzheimer's but a measure of neural degeneration in general, degeneration which might be caused by other conditions~\cite{jack2010brain}.
 
-\subsection{Clinical Dementia Rating}
-Clinical Dementia Rating (CDR) is a mesure of
+\subsection{Clinical dementia rating}
+Clinical dementia rating (CDR) is a mesure of
 
-\section{Machine Learning}
-\subsection{Neural Networks}
+\section{Machine learning}
+\subsection{Neural networks}
 
-\subsection{Convolutional Neural Networks}
-\subsection{Densely Connected CNNs}
+\subsection{Convolutional neural networks}
 
-\section{Previous Work}
+\subsection{Gradient ascent in input space}
+
+\section{Previous work}
 
 \chapter{Methods}
 
@@ -110,6 +112,21 @@ I will use the assessment of the subjects CDR score to label every MRI image wit
 
 To try to get reasonable CDR labels even when the time offsets are high I will use a linear interpolation of the two closest CDR assessments and the time of the MRI scan, when this is possible. If the MRI scan was done either before or after all of this subjects' CDR assessments I will simply use the closest one.
 
+The CDR calculation can be written as follows:
+\begin{flalign*}
+  \begin{aligned}
+    \text{cdr} &=
+    \begin{cases}
+      \text{cdr}_{\text{next}}   & \text{if before all assessments} \\
+      \text{cdr}_{\text{prev}} & \text{if after all assessments} \\
+      \text{cdr}_{\text{prev}} + x * (\text{cdr}_{\text{next}} - \text{cdr}_{\text{prev}}) & \text{otherwise} \\
+    \end{cases} & \\[5pt]
+    \text{where }x &= \frac{\text{day}_{\text{MRI}} - \text{day}_\text{prev}}{\text{day}_{\text{prev}} - \text{day}_{\text{next}}}&
+  \end{aligned}
+\end{flalign*}
+
+Here $0 \leq x \leq 1$ is the interpolation factor between the two assessments closest to $\text{day}_{\text{MRI}}$, the day the MRI scan was done.
+
 \begin{figure}
   \begin{center}
     \includegraphics[width=100mm]{img/mri_cdr_offset.pdf}
@@ -118,7 +135,7 @@ To try to get reasonable CDR labels even when the time offsets are high I will u
   \end{center}
 \end{figure}
 
-\section{Image Extraction}
+\section{Image extraction}
 During the preprocessing step the three image planes are extracted from each MRI scan. For simplicity the planes chosen are simply the middle one for each axis, and the raw intensity values from each scan are flattened into the normal black/white range of PNG images.
 
 Some scans are rotated the wrong way, even after realigning the images when loading. These images are simply skipped for now.
@@ -127,7 +144,6 @@ Some scans are rotated the wrong way, even after realigning the images when load
 The dataset in total contains 2782 images (ignoring the wrongly rotated ones). Of these images 10~\% were selected to be used as validation data, while the other 90~\% will be used to train the network. Just as in the paper by \textcite{islam2018early} I will use the CDR scores to divide the images into four classes: \textit{non-demented}, \textit{very mild dementia}, \textit{mild dementia}, and \textit{moderate dementia}. These classes are not equally represented in the dataset, with the more serious dementia cases being much less frequent. The total count of each case is shown in Table~\ref{tab:dataset_contents}, with the count in training and verification broken out.
 
 \begin{table}[h]
-  
   \begin{center}
     \caption{Count of images belonging to each class in the dataset.\label{tab:dataset_contents}}
     \begin{tabular}{r|cccc}
@@ -153,10 +169,62 @@ The CNN used by \textcite{islam2018early} uses a densely connected architecture 
 \textcite{islam2018early} do not use the entire 3D images obtained from the MRI scans. Instead, they take three slices of the image along different planes and patch them together into an image, which is then used as input to the model. It would be interesting to see if 3D convolutions could be useful for this problem, this is something we will look into if we have time.
 
 \chapter{Results}
-The learning rate of the Adam optimizer was found to be very important for good results. The default learning rate of $0.001$ appears to be to large, and the result was the network not improving. A lower rate of $10^{-4}$ resulted in more and faster improvement during training.
+\begin{figure}
+  \begin{center}
+    \includegraphics[width=100mm]{img/overfitted.png}
+    \caption{The result when training the network for 1000 epochs without data augmentation. (Note log scale on left diagram.)}
+    \label{fig:overfitted}
+  \end{center}
+\end{figure}
+\begin{figure}
+  \begin{center}
+    \includegraphics[width=100mm]{img/overfitted_acc.png}
+    \caption{The result when training the network for 1000 epochs without data augmentation. (Note log scale on left diagram.)}
+    \label{fig:overfitted_acc}
+  \end{center}
+\end{figure}
+
+\begin{figure}
+  \begin{subfigure}{.5\textwidth}
+    \centering
+    \includegraphics[width=0.9\linewidth]{img/layer0.png}
+    \caption{Initial convolution}
+    \label{fig:layer0}
+  \end{subfigure}%
+  \begin{subfigure}{.5\textwidth}
+    \centering
+    \includegraphics[width=0.9\linewidth]{img/layer1.png}
+    \caption{Second convolution}
+    \label{fig:layer1}
+  \end{subfigure}
+  \\[10pt]
+  \begin{subfigure}{1\textwidth}
+    \centering
+    \includegraphics[width=0.45\linewidth]{img/layer2.png}
+    \caption{Third convolution}
+    \label{fig:layer1}
+  \end{subfigure}
+  \caption{Selected visualizations of filters from the first three convolution layers.}
+  \label{fig:filtervis}
+\end{figure}
+
+The learning rate of the Adam optimizer was found to be very important for good results. The default learning rate of $0.001$ appears to be to large, and the result was the network not improving. A lower rate of $10^{-5}$ resulted in more and faster improvement during training.
+
+
+Validating on 555 images...
+              precision    recall  f1-score   support
+
+           0       0.85      0.88      0.86       422
+           1       0.39      0.32      0.35        96
+           2       0.30      0.29      0.29        35
+           3       0.00      0.00      0.00         2
+
+   micro avg       0.74      0.74      0.74       555
+   macro avg       0.38      0.37      0.38       555
+weighted avg       0.73      0.74      0.74       555
 
 \chapter{Discussion}
-Just as in the study by \textcite{islam2018early} the low count of demented samples is an issue. Thanks to OASIS-3 being a much larger dataset than the original OASIS this is not too large of a problem during training, but the low count is noticible during validation, with single-digit numbers for the rarest class (\textit{moderate dementia}). This gives very rough models for the accuracy of the model, and it might be useful to increase the ratio of validation to training data.
+Just as in the study by \textcite{islam2018early}, the low frequency of samples showing progressed dementia in the dataset is an issue. Thanks to OASIS-3 containing many times the number of MRI images as the original OASIS does, this is not too large of a problem during training, The low frequency is however very noticible during validation, when it results in single-digit counts of the rarest class (\textit{moderate dementia}). This gives very rough knowledge of how accurate the model actually is on this type of data. It might be useful to increase the ratio of validation to training data, and in the long term create new and larger datasets that enables researchers to evaluate their models' performance with more confidence. On the other hand, detecting these progressed cases of dementia might no be very useful in practice, since by then the symptoms will be so pronounced that the diagnosis can not be missed.
 
 \subsection{Method}
 \subsection{Results}
