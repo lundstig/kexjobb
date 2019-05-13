@@ -8,8 +8,10 @@
 \usepackage{csquotes} % Recommended by biblatex
 \usepackage{subcaption}
 \usepackage{wrapfig}
+
 \addbibresource{references.bib} % The file containing our references, in BibTeX format
 \renewcommand{\arraystretch}{1.2}
+\newcommand{\source}[1]{\caption*{Source: {#1}} }
 \captionsetup[table]{skip=10pt}
 
 \title{Evaluating a simple convolutional neural network for classifying Alzheimer's disease}
@@ -64,10 +66,10 @@ In the last couple of years machine learning and specifically deep learning have
 
 Alzheimer’s Disease (AD) is a neurodegenerative disease that is the leading cause of dementia. There is currently no cure, but early detection is still important as it can be beneficial to the patient~\cite{factsfigures2018}.
 
-Two studies by \textcite{islam2017novel, islam2018early} showed promising results for identifying and classifying Alzheimer’s Disease from MRI data. This was done using a version of a convolutional neural network (CNN) trained on the OASIS dataset \parencite{marcus2010open}. While their model showed acceptable performance for identifying non-demented patients, its performance on classifying demented patients was significantly worse, which could be because of the limited number of samples. 
+Many studies~\cite{islam2017novel, islam2018early} shows promising results for identifying and classifying Alzheimer’s Disease using structural MRI data, using mainly the OASIS\cite{oasis} or ADNI\cite{adni} datasets.
 
 \section{Research Question}
-This project aims to apply the model Islam and Zhang developed to the larger OASIS-3 dataset \parencite{oasis3} and evaluate the resulting accuracy. We hope to see improved performance, especially in classifying the disease stage of demented patients. This would be interesting since it means that the model they developed might be able to diagnose dementia accurately, if there existed a sufficiently large training dataset.
+This study will not try to acheive state-of-the-art results on Alzheimer's disease diagnosis; instead the goal is to evaluate the performance of a simple CNN model on medical data when using various training schemes. The model's accuracy will be measured starting from the simplest strategy, and then various improvements will be incrementally added and evaluated.
 
 \section{Acknowledgments}
 Data were provided by OASIS-3: Principal Investigators: T. Benzinger, D. Marcus, J. Morris; NIH P50AG00561, P30NS09857781, P01AG026276, P01AG003991, R01AG043434, UL1TR000448, R01EB009352. AV-45 doses were provided by Avid Radiopharmaceuticals, a wholly owned subsidiary of Eli Lilly.
@@ -84,7 +86,7 @@ Early (and accurate) diagnosis of Alzheimer's disease has several benefits. Thos
 Individuals with Alzheimer's disease can experience multiple and varying symptoms, which change over several years~\cite{factsfigures2018}.
 
 \subsection{Benefits of early detection}
-Early (and accurate) diagnosis of Alzheimer's disease has several benefits. Those who do not have Alzheimer's but are diagnosed with mild cognitive impairment, might after testing realize that they're suffering from some other, treatable condition. There are also medical and social benefits to get an Alzheimer's diagnosis early. Neither a curing nor a slowing treatment exist, but individuals can still take measures to retain ther cognitive function for as long as possible. Aerobic exercise, mental activity and social engagement may help delay cognitive decline, while medication and other intervention can help with managing symptoms. An early diagnosis can also help reduce anxiety by giving noticed symptoms a name, for both affected individuals and their family members. Finally, early diagnosis gives individuals time to make plans for the future while still having good cognitive function~\cite[p. 406-409]{factsfigures2018}.
+Early (and accurate) diagnosis of Alzheimer's disease has several benefits. Those who do not have Alzheimer's but are diagnosed with mild cognitive impairment, might after testing realize that they're suffering from some other, treatable condition. There are also medical and social benefits to get an Alzheimer's diagnosis early. Neither a curing nor a slowing treatment exist, but individuals can still take some measures that helps them retain their cognitive function for as long as possible. Aerobic exercise, mental activity and social engagement may help delay cognitive decline, while medication and other intervention can help with managing symptoms. An early diagnosis can also help reduce anxiety by giving noticed symptoms a name, for both affected individuals and their family members. Finally, early diagnosis gives individuals time to make plans for the future while still having good cognitive function~\cite[p. 406-409]{factsfigures2018}.
 
 \subsection{Brain changes}
 The abnormal accumulation of two proteins (what is called beta-amyloid plaques and tau tangles) inside the brain is one of several brain changes associated with Alzheimer's disease. These proteins interfer with neuron communication and nutrient transportation, while also triggering inflammation. Brain shrinkage, or \textit{atrophy,} eventually occurs because of cell loss. These changes may start as early as 20 years or more before symptoms appear~\cite{factsfigures2018}.
@@ -95,7 +97,25 @@ Brain atrophy occurs in a relatively late disease stage, when neurodegeneration 
 Clinical dementia rating (CDR) is a mesure of
 
 \section{Machine learning}
-\subsection{Neural networks}
+\subsection{Artificial neural networks}
+\subsubsection{Introduction}
+Artificial neural networks (ANNs) are computational modeling tools inspired by the neural networks found in biology. ANNs exhibit several information processing characteristics which make them useful for modeling complex real-word problems, among them non-linearity, their ability to handle imprecise information, and their ability to generalize~\cite{ANNFundamentals}. A common machine learning task is \textit{classification}. Here the machine learning algorithm is presented with a dataset containing many datapoints, each having some number of features and an assigned class. The goal of the machine learning model is then to learn a mapping from features to class, such that the model can be applied to new data where the class is unknown. ANNs are often used successfully for this task, but they do have the drawback that the models are opaque, or in other words they can't reason about why they give the output that they do~\cite[p. 3, 8--9]{weiss1990empirical}.
+
+\begin{figure}
+  \begin{center}
+    \includegraphics[width=100mm]{img/neural_network.png}
+    \caption{An illustration of a multi-layer artifical neural network. }
+    \source{Offnfopt / CC-BY-SA 3.0.}
+    \label{fig:mlf}
+  \end{center}
+\end{figure}
+
+\subsubsection{Structure}
+Artificial neural networks can be constructed in different ways, but the most common is the so called \textit{multi-layer feed-forward neural network}, illustrated in Figure~\ref{fig:mlf}. It consists of neurons ordered into multiple layers, the first layer being the \textit{input layer} and the last one the \textit{output layer}. The layers in between are called \textit{hidden layers}. Each neuron is connected with all the neurons in the next layer, with every connection from neuron $i$ to neuron $j$ having a weight coefficient $w_{ij}$. In addition, every neuron has a threshhold coefficient, or bias $b_i$. Using these coefficients and all the inputs from the previous layer, every neuron produces an output $x_i$, calculated as follows:
+\[x_i = f(\sum_{j \in \text{prev. layer}}{w_{ij}x_j})\]
+
+, every neuron can be seen as a function f~\cite{mlfIntro}.
+
 \subsubsection{Gradient descent}
 \textit{stochastic gradient descent}
 \subsubsection{Backpropagation}
@@ -105,6 +125,8 @@ Clinical dementia rating (CDR) is a mesure of
 \subsection{Gradient ascent in input space}
 
 \section{Previous work}
+Zhang and co.
+This was done using a version of a convolutional neural network (CNN) trained on the OASIS dataset \parencite{oasis}. While their model showed acceptable performance for identifying non-demented patients, its performance on classifying demented patients was significantly worse, which could be because of the limited number of samples.
 
 \chapter{Methods}
 
