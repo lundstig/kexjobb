@@ -1,11 +1,13 @@
 \documentclass{kththesis}
 
+\usepackage[export]{adjustbox}
 \usepackage{amsmath}
 \usepackage[style=numeric,sorting=none,backend=biber]{biblatex}
 \usepackage{booktabs}
 \usepackage{caption}
 \usepackage{csquotes} % Recommended by biblatex
 \usepackage{subcaption}
+\usepackage{wrapfig}
 \addbibresource{references.bib} % The file containing our references, in BibTeX format
 \renewcommand{\arraystretch}{1.2}
 \captionsetup[table]{skip=10pt}
@@ -94,6 +96,9 @@ Clinical dementia rating (CDR) is a mesure of
 
 \section{Machine learning}
 \subsection{Neural networks}
+\subsubsection{Gradient descent}
+\textit{stochastic gradient descent}
+\subsubsection{Backpropagation}
 
 \subsection{Convolutional neural networks}
 
@@ -141,7 +146,7 @@ During the preprocessing step the three image planes are extracted from each MRI
 Some scans are rotated the wrong way, even after realigning the images when loading. These images are simply skipped for now.
 
 \section{Dataset contents}
-The dataset in total contains 2782 images (ignoring the wrongly rotated ones). Of these images 10~\% were selected to be used as validation data, while the other 90~\% will be used to train the network. Just as in the paper by \textcite{islam2018early} I will use the CDR scores to divide the images into four classes: \textit{non-demented}, \textit{very mild dementia}, \textit{mild dementia}, and \textit{moderate dementia}. These classes are not equally represented in the dataset, with the more serious dementia cases being much less frequent. The total count of each case is shown in Table~\ref{tab:dataset_contents}, with the count in training and verification broken out.
+The dataset in total contains 2782 images (ignoring the wrongly rotated ones). Of these images 20~\% were selected to be used as validation data, while the other 80~\% will be used to train the network. Just as in the paper by \textcite{islam2018early} I will use the CDR scores to divide the images into four classes: \textit{non-demented}, \textit{very mild dementia}, \textit{mild dementia}, and \textit{moderate dementia}. These classes are not equally represented in the dataset, with the more serious dementia cases being much less frequent. The total count of each case is shown in Table~\ref{tab:dataset_contents}, with the count in training and verification broken out.
 
 \begin{table}[h]
   \begin{center}
@@ -157,7 +162,17 @@ The dataset in total contains 2782 images (ignoring the wrongly rotated ones). O
   \end{center}
 \end{table}
 
-\section{Old text}
+\newpage
+\section{Network structure}
+\begingroup
+\setlength{\columnsep}{0pt}%
+\setlength\intextsep{0mm}
+\begin{wrapfigure}{l}{0.3\linewidth}
+  % \adjustimage{width=.3\textwidth,left}{img/model.pdf}
+  \hspace*{-30mm}
+	\includegraphics[width=1.7\linewidth]{img/model.pdf}
+\end{wrapfigure}
+
 We will recreate the convolutional neural network (CNN) setup used in the study by Islam and Zhang, using the machine learning framework Keras. The network will be trained and evaluated on the OASIS-3 dataset. This dataset contains data from over 2000 MRI sessions and 1000 patients, as well as medical evaluations of their disease state. OASIS-3 was a longitudinal study, which means that the imaging and evaluation of every patient was performed over a large span of time.
 
 The dataset will be split into training, validation, and test sets, as done by Islam and Zhang. The CNN will never have seen the test set, and so it will be used for testing the accuracy. The study by Islam and Zhang resulted in a series of numerical values for accuracy, more specifically precision, recall, and f1 score. We will calculate the same values for our network trained on the larger dataset, and then compare our results with theirs. 
@@ -167,6 +182,8 @@ Studies using the smaller OASIS dataset often use cross-validation, where the tr
 The CNN used by \textcite{islam2018early} uses a densely connected architecture that seems identical to DenseNet~\cite{huang2017densely}. DenseNet has implementations for both Tensorflow and PyTorch. A dense architecture means that each layer in the network is not just connected to the previous layer, but also to every other layer that came before it. This can speed up training and reduce overfitting by shrinking the parameter space and providing more direct connections between different parts of the network.
 
 \textcite{islam2018early} do not use the entire 3D images obtained from the MRI scans. Instead, they take three slices of the image along different planes and patch them together into an image, which is then used as input to the model. It would be interesting to see if 3D convolutions could be useful for this problem, this is something we will look into if we have time.
+
+\endgroup
 
 \chapter{Results}
 \begin{figure}
@@ -204,12 +221,15 @@ The CNN used by \textcite{islam2018early} uses a densely connected architecture 
     \caption{Third convolution}
     \label{fig:layer1}
   \end{subfigure}
-  \caption{Selected visualizations of filters from the first three convolution layers.}
+  \caption{Selected filter visualizations from the first three convolution layers.}
   \label{fig:filtervis}
 \end{figure}
 
 The learning rate of the Adam optimizer was found to be very important for good results. The default learning rate of $0.001$ appears to be to large, and the result was the network not improving. A lower rate of $10^{-5}$ resulted in more and faster improvement during training.
 
+\subsection{Initial training}
+At first, the network reached an accuracy of around 78~\% in a single epoch. Further training did not let the network progress.
+Training the data with all classes equally, results in the op
 
 Validating on 555 images...
               precision    recall  f1-score   support
@@ -224,7 +244,7 @@ Validating on 555 images...
 weighted avg       0.73      0.74      0.74       555
 
 \chapter{Discussion}
-Just as in the study by \textcite{islam2018early}, the low frequency of samples showing progressed dementia in the dataset is an issue. Thanks to OASIS-3 containing many times the number of MRI images as the original OASIS does, this is not too large of a problem during training, The low frequency is however very noticible during validation, when it results in single-digit counts of the rarest class (\textit{moderate dementia}). This gives very rough knowledge of how accurate the model actually is on this type of data. It might be useful to increase the ratio of validation to training data, and in the long term create new and larger datasets that enables researchers to evaluate their models' performance with more confidence. On the other hand, detecting these progressed cases of dementia might no be very useful in practice, since by then the symptoms will be so pronounced that the diagnosis can not be missed.
+Just as in the study by \textcite{islam2018early}, the low frequency of samples in the dataset showing progressed dementia is an issue. Thanks to OASIS-3 containing many times the number of MRI images as the original OASIS does, this is not too large of a problem during training, The low frequency is however very noticible during validation, when it results in single-digit counts of the rarest class (\textit{moderate dementia}). This gives very rough knowledge of how accurate the model actually is on this type of data. It might be useful to increase the ratio of validation to training data, and in the long term create new and larger datasets that enables researchers to evaluate their models' performance with more confidence. On the other hand, detecting these progressed cases of dementia might no be very useful in practice, since by then the symptoms will be so pronounced that the diagnosis can not be missed.
 
 \subsection{Method}
 \subsection{Results}
