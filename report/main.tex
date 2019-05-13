@@ -6,6 +6,7 @@
 \usepackage{booktabs}
 \usepackage{caption}
 \usepackage{csquotes} % Recommended by biblatex
+\usepackage{relsize}
 \usepackage{subcaption}
 \usepackage{wrapfig}
 
@@ -111,13 +112,48 @@ Artificial neural networks (ANNs) are computational modeling tools inspired by t
 \end{figure}
 
 \subsubsection{Structure}
-Artificial neural networks can be constructed in different ways, but the most common is the so called \textit{multi-layer feed-forward neural network}, illustrated in Figure~\ref{fig:mlf}. It consists of neurons ordered into multiple layers, the first layer being the \textit{input layer} and the last one the \textit{output layer}. The layers in between are called \textit{hidden layers}. Each neuron is connected with all the neurons in the next layer, with every connection from neuron $i$ to neuron $j$ having a weight coefficient $w_{ij}$. In addition, every neuron has a threshhold coefficient, or bias $b_i$. Using these coefficients and all the inputs from the previous layer, every neuron produces an output $x_i$, calculated as follows:
-\[x_i = f(\sum_{j \in \text{prev. layer}}{w_{ij}x_j})\]
+Artificial neural networks can be constructed in different ways, but the most common is the so called \textit{multi-layer feed-forward neural network}, illustrated in Figure~\ref{fig:mlf}. It consists of neurons ordered into multiple layers, the first layer being the \textit{input layer} and the last one the \textit{output layer}. The layers in between are called \textit{hidden layers}. Each neuron is connected with all the neurons in the next layer, with every connection from neuron $i$ to neuron $j$ having a weight coefficient $w_{ij}$. In addition, every neuron has a threshhold coefficient, or bias $b_i$. Using these coefficients and all the inputs from the previous layer, every neuron produces an output $x_i$, which can be formally written as follows:
+\[x_i = \mathlarger{\varphi}\left(\sum_{j \in \Gamma^{-1}(i)}{w_{ij} \cdot x_j}\right)\]
 
-, every neuron can be seen as a function f~\cite{mlfIntro}.
+Here $\Gamma^{-1}(i)$ is notation for the set of all neurons in the previous layer, and $\varphi$ is some \textit{activation function} which squeezes the weighted sum of all input neurons into the range $[0, 1]$, in preparation of passing the output along to the next neuron~\cite{mlfIntro}.j
+
+\subsubsection{Activation functions}
+There are many possible choices for the activation function, but three of the most common ones can be found in Table~\ref{tab:activation_functions}. The softmax activation function is a little different than the others since it doesn't work on only one neuron, but instead on all neurons in the layer. In doing this, the softmax function can ensure that the sum of all the output values are equal to $1$, which is a desirable thing for the output layer when classifying into $K$ different classes. This also allows the use the \textit{cross-entropy error function} (see later section), which seems to give higher accuracy than using the sigmoid function and the \textit{least squares error function}~\cite{dunne1997pairing}.
+
+\begin{table}[h]
+  \renewcommand{\arraystretch}{1.2}
+  \begin{center}
+    \caption{Selection of common activation functions.}
+    \label{tab:activation_functions}
+    \begin{tabular}{cc}
+      \textbf{Name} & \textbf{Function} $\varphi(x)$\\
+      \toprule
+      Sigmoid & $\displaystyle \frac{1}{1 + e^{-x}} $ \\[4mm]
+      Rectifier & $\displaystyle \max(0, x)$ \\[3mm]
+      Softmax & $\displaystyle \frac{e^{x_i}}{\sum_j^K{e^{x_j}}}$ \\
+    \end{tabular}
+  \end{center}
+\end{table}
+
+\subsubsection{Error functions}
+To be able to train our network, we need some way to determine how `bad' a certain output is. This is done using an \textit{error function}, or \textit{loss function}. This function is averaged on the network's output on all training samples. In a classification task, the averaged loss being low means that the network is good at predicting the correct class given a certain input data. If the network performs perfectly, the error function is generally $0$. \textit{Least squares error} is a traditional error function, and if you let $x$ and $\hat{x}$ be the network's output and the wanted output respectively, the least squares error is defined as~\cite{mlfIntro}:
+
+\[ E = \sum_i{\frac{1}{2}(x_i - \hat{x}_i)^2} \] 
+
+There is however also another error function that was mentioned earlier, the \textit{cross-entropy error} function. This has some theoretical advantages over least squares error, such as better handling when the probabilities estimated by the network is small, as well as being less dominated by large outliers. Experiments also suggest that these advantages are large enough to be useful in practice~\cite{crossentropy_squared}. The cross-entropy is defined like this:
+
+\[ E = \sum_i{\hat{x}_i\left(\frac{x_i}{\hat{x}_i}\right)} \]
 
 \subsubsection{Gradient descent}
-\textit{stochastic gradient descent}
+\begin{wrapfigure}{r}{0.3\linewidth}
+  \includegraphics[width=1.6\linewidth]{img/gradient_descent.png}
+\end{wrapfigure}
+To train a neural network, we want to change the weights and biases (the network's parameters) such that the error on the training set becomes as low as possible. This is done using a process called \textit{gradient descent}. Given the error function and the dataset, the neural network can be viewed a giant function, taking all the parameters as input. By finding the slope or \textit{gradient} of the parameters in the direction that decreases the error, the parameters can gradually be adjusted to find a minimum of the error function. Since this gradient is calculated using the entire dataset to perform a single step, it is known as \textit{batch} gradient descent. Due to this batch gradient descent can become very slow on large datasets, and does not work at all if the dataset does not fit in memory~\cite{gradient_descent}
+
+Because of this a variant of gradient descent named \textit{stochastic} gradient descent (SGD) is sometimes used, where the gradient is calculated using only a single training example at a time. This makes updates to the parameters much faster, but also causes the error function to jump around. This fluctuation adds noise, but also helps the model to not get stuck in local minima. SGD also has the benefit of allowing online learning, where the network can train on new data as it becomes available. In addition the overhead of calculating the gradient this many times might have a negative influence on the final perfomance~\cite{gradient_descent}.
+
+There is also a third option, \textit{mini-batch} gradient descent, which aims to combine the best of both batch and stochastic gradient descent. Here the gradient calculation is performed on \textit{mini-batches} of $n$ training examples. This can help by making the updates more stable, and also helps with utilizing optimized matrix libraries that enables quickly calculating the gradient for a mini-batch. This is the method typically used when training neural networks in practice, and the term SGD is usually used to refer to this method as well.
+
 \subsubsection{Backpropagation}
 
 \subsection{Convolutional neural networks}
@@ -192,7 +228,7 @@ The dataset in total contains 2782 images (ignoring the wrongly rotated ones). O
 \begin{wrapfigure}{l}{0.3\linewidth}
   % \adjustimage{width=.3\textwidth,left}{img/model.pdf}
   \hspace*{-30mm}
-	\includegraphics[width=1.7\linewidth]{img/model.pdf}
+  \includegraphics[width=1.7\linewidth]{img/model.pdf}
 \end{wrapfigure}
 
 We will recreate the convolutional neural network (CNN) setup used in the study by Islam and Zhang, using the machine learning framework Keras. The network will be trained and evaluated on the OASIS-3 dataset. This dataset contains data from over 2000 MRI sessions and 1000 patients, as well as medical evaluations of their disease state. OASIS-3 was a longitudinal study, which means that the imaging and evaluation of every patient was performed over a large span of time.
@@ -211,15 +247,15 @@ The CNN used by \textcite{islam2018early} uses a densely connected architecture 
 \begin{figure}
   \begin{center}
     \includegraphics[width=100mm]{img/overfitted.png}
-    \caption{The result when training the network for 1000 epochs without data augmentation. (Note log scale on left diagram.)}
     \label{fig:overfitted}
+    \caption{The result when training the network for 1000 epochs without data augmentation. (Note log scale on left diagram.)}
   \end{center}
 \end{figure}
 \begin{figure}
   \begin{center}
     \includegraphics[width=100mm]{img/overfitted_acc.png}
-    \caption{The result when training the network for 1000 epochs without data augmentation. (Note log scale on left diagram.)}
     \label{fig:overfitted_acc}
+    \caption{The result when training the network for 1000 epochs without data augmentation. (Note log scale on left diagram.)}
   \end{center}
 \end{figure}
 
@@ -227,29 +263,29 @@ The CNN used by \textcite{islam2018early} uses a densely connected architecture 
   \begin{subfigure}{.5\textwidth}
     \centering
     \includegraphics[width=0.9\linewidth]{img/layer0.png}
-    \caption{Initial convolution}
     \label{fig:layer0}
+    \caption{Initial convolution}
   \end{subfigure}%
   \begin{subfigure}{.5\textwidth}
     \centering
     \includegraphics[width=0.9\linewidth]{img/layer1.png}
-    \caption{Second convolution}
     \label{fig:layer1}
+    \caption{Second convolution}
   \end{subfigure}
   \\[10pt]
   \begin{subfigure}{1\textwidth}
     \centering
     \includegraphics[width=0.45\linewidth]{img/layer2.png}
+    \label{fig:layer2}
     \caption{Third convolution}
-    \label{fig:layer1}
   \end{subfigure}
-  \caption{Selected filter visualizations from the first three convolution layers.}
   \label{fig:filtervis}
+  \caption{Selected filter visualizations from the first three convolution layers.}
 \end{figure}
 
 The learning rate of the Adam optimizer was found to be very important for good results. The default learning rate of $0.001$ appears to be to large, and the result was the network not improving. A lower rate of $10^{-5}$ resulted in more and faster improvement during training.
 
-\subsection{Initial training}
+\section{Initial training}
 At first, the network reached an accuracy of around 78~\% in a single epoch. Further training did not let the network progress.
 Training the data with all classes equally, results in the op
 
@@ -268,8 +304,8 @@ weighted avg       0.73      0.74      0.74       555
 \chapter{Discussion}
 Just as in the study by \textcite{islam2018early}, the low frequency of samples in the dataset showing progressed dementia is an issue. Thanks to OASIS-3 containing many times the number of MRI images as the original OASIS does, this is not too large of a problem during training, The low frequency is however very noticible during validation, when it results in single-digit counts of the rarest class (\textit{moderate dementia}). This gives very rough knowledge of how accurate the model actually is on this type of data. It might be useful to increase the ratio of validation to training data, and in the long term create new and larger datasets that enables researchers to evaluate their models' performance with more confidence. On the other hand, detecting these progressed cases of dementia might no be very useful in practice, since by then the symptoms will be so pronounced that the diagnosis can not be missed.
 
-\subsection{Method}
-\subsection{Results}
+\section{Method}
+\section{Results}
 
 \chapter{Conclusions}
 
