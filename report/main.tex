@@ -16,9 +16,7 @@
 \renewcommand{\arraystretch}{1.2}
 \newcommand{\source}[1]{\vspace{-5mm}\caption*{\textcolor{darkgray}{Author: {#1}}\vspace{-7mm}} }
 \captionsetup[table]{skip=10pt}
-
-\title{Evaluating a simple convolutional neural network for classifying Alzheimer's disease}
-\alttitle{Utvärdering av ett enkelt CNN-nätverk för klassifiering av Alzheimers sjukdom}
+\title{Evaluating a simple convolutional neural network for classifying Alzheimer's disease} \alttitle{Utvärdering av ett enkelt CNN-nätverk för klassifiering av Alzheimers sjukdom}
 \author{Karl Lundstig}
 \email{lundsti@kth.se}
 \supervisor{Jeanette Hällgren Kotaleski}
@@ -85,7 +83,7 @@ Data were provided by OASIS-3: Principal Investigators: T. Benzinger, D. Marcus,
 
 Dementia is a group of symptoms that may have many different causes. Alzheimer's disease is a degenerative brain disease, estimated to be the cause of 60\% to 80\% of dementia cases. In half of these cases Alzheimer's is the only cause, while many other also have evidence of other dementia causing changes~\cite{factsfigures2018}.
 
-Early (and accurate) diagnosis of Alzheimer's disease has several benefits. Those who do not have Alzheimer's but are diagnosed with mild cognitive impairment, might after testing realize that they're suffering from some other, treatable condition. There are also medical and social benefits to get an Alzheimer's diagnosis early. Neither a curing nor a slowing treatment exist, but individuals can still take measures to retain ther cognitive function for as long as possible. Aerobic exercise, mental activity and social engagement may help delay cognitive decline, while medication and other intervention can help with managing symptoms. An early diagnosis can also help reduce anxiety by giving noticed symptoms a name, for both affected individuals and their family members. Finally, early diagnosis gives individuals time to make plans for the future while still having good cognitive function~\cite[p. 406-409]{factsfigures2018}.
+Early (and accurate) diagnosis of Alzheimer's disease has several benefits. Those who do not have Alzheimer's but are diagnosed with mild cognitive impairment, might after testing realize that they're suffering from some other, treatable condition. There are also medical and social benefits to get an Alzheimer's diagnosis early. Neither a curing nor a slowing treatment exist, but individuals can still take measures to retain ther cognitive function for as long as possible. Aerobic exercise, mental activity and social engagement may help delay cognitive decline, while medication and other intervention can help with managing symptoms. An early diagnosis can also help reduce anxiety by giving the noticed symptoms a name, for both affected individuals and their family members. Finally, early diagnosis gives individuals time to make plans for the future while still having good cognitive function~\cite[p. 406-409]{factsfigures2018}.
 
 \subsection{Symptoms}
 Individuals with Alzheimer's disease can experience multiple and varying symptoms, which change over several years~\cite{factsfigures2018}.
@@ -270,12 +268,14 @@ The dataset in total contains 2782 images (ignoring the wrongly rotated ones). O
   \begin{center}
     \caption{Count of images belonging to each class in the dataset.\label{tab:dataset_contents}}
     \begin{tabular}{r|cccc}
-      \textbf{CDR Class} & \textbf{Total} & \textbf{Training set} & \textbf{Verification set} \\
+      \textbf{CDR Class} & \textbf{Total} & \textbf{Training set} & \textbf{Validation set} \\
       \toprule
-      Non-demented (0.0) & 2163 & 1787 & 376 \\
-      Very mild (0.5) & 443 & 357 & 86 \\
-      Mild (1.0) & 153 & 120 & 33 \\
-      Moderate (2.0) & 23 & 18 & 5 \\
+      Non-demented (0.0) & 2162 & 1722 & 440 \\
+      Very mild (0.5) & 442 & 362 & 80 \\
+      Mild (1.0) & 152 & 121 & 31 \\
+      Moderate (2.0) & 22 & 17 & 5 \\
+      \bottomrule
+      \textbf{Sum} & 2778 & 2222 & 556 \\
     \end{tabular}
   \end{center}
 \end{table}
@@ -291,6 +291,9 @@ The dataset in total contains 2782 images (ignoring the wrongly rotated ones). O
   \includegraphics[width=1.7\linewidth]{img/model.pdf}
 \end{wrapfigure}
 
+
+
+\subsubsection{Old stuff, ignore}
 We will recreate the convolutional neural network (CNN) setup used in the study by Islam and Zhang, using the machine learning framework Keras. The network will be trained and evaluated on the OASIS-3 dataset. This dataset contains data from over 2000 MRI sessions and 1000 patients, as well as medical evaluations of their disease state. OASIS-3 was a longitudinal study, which means that the imaging and evaluation of every patient was performed over a large span of time.
 
 The dataset will be split into training, validation, and test sets, as done by Islam and Zhang. The CNN will never have seen the test set, and so it will be used for testing the accuracy. The study by Islam and Zhang resulted in a series of numerical values for accuracy, more specifically precision, recall, and f1 score. We will calculate the same values for our network trained on the larger dataset, and then compare our results with theirs. 
@@ -301,9 +304,81 @@ The CNN used by \textcite{islam2018early} uses a densely connected architecture 
 
 \textcite{islam2018early} do not use the entire 3D images obtained from the MRI scans. Instead, they take three slices of the image along different planes and patch them together into an image, which is then used as input to the model. It would be interesting to see if 3D convolutions could be useful for this problem, this is something we will look into if we have time.
 
+\section{Model iterations}
+A few different training methods for the CNN network will be tried and evaluated. The network will train for \num{1000} epochs using each training regime, and the accuracy on the different classes will be measured.
+
+\subsection{Default training}
+
+
+\subsection{Class-weighted training}
+
+
+\subsection{Training with data augmentation}
+
 \endgroup
 
 \chapter{Results}
+
+The learning rate of the Adam optimizer was found to be very important for good results. The default learning rate of $0.001$ appears to be to large, and the result was the network not improving. A lower rate of $10^{-5}$ resulted in more and faster improvement during training.
+
+\section{Default training}
+
+\begin{figure}
+  \centering
+  \includegraphics[width=0.9\linewidth]{img/loss_default.pdf}
+  \label{fig:loss_default}
+  \caption{Loss during training with the default training scheme.}
+\end{figure}
+\begin{figure}
+  \centering
+  \includegraphics[width=0.9\linewidth]{img/accuracy_default.pdf}
+  \label{fig:accuracy_default}
+  \caption{Accuracy during training with the default training scheme.}
+\end{figure}
+
+\begin{table}[h]
+  \begin{center}
+    \caption{Results for default training. \label{tab:results_class_weighted}}
+    \begin{tabular}{r|ccc|c}
+      \textbf{CDR Class} & \textbf{Precision} & \textbf{Recall} & \textbf{f1-Score} & \textbf{Support} \\
+      \toprule
+      0 & 0.88 & 0.91 & 0.89 & 440 \\
+      1 & 0.51 & 0.46 & 0.49 & 80  \\
+      2 & 0.40 & 0.32 & 0.36 & 31  \\
+      3 & 0.33 & 0.20 & 0.25 & 5   \\
+    \end{tabular}
+  \end{center}
+\end{table}
+\begin{figure}
+  \centering
+  \includegraphics[width=0.9\linewidth]{img/loss_class_weighted.pdf}
+  \label{fig:loss_default}
+  \caption{Loss during training with class-weighting.}
+\end{figure}
+\begin{figure}
+  \centering
+  \includegraphics[width=0.9\linewidth]{img/accuracy_class_weighted.pdf}
+  \label{fig:accuracy_default}
+  \caption{Accuracy during training with class-weighting.}
+\end{figure}
+
+\section{Class-weighted training}
+\begin{table}[h]
+  \begin{center}
+    \caption{Results for class-weighted training. \label{tab:results_class_weighted}}
+    \begin{tabular}{r|ccc|c}
+      \textbf{CDR Class} & \textbf{Precision} & \textbf{Recall} & \textbf{f1-Score} & \textbf{Support} \\
+      \toprule
+      0 & 0.87 & 0.93 & 0.90 & 440 \\
+      1 & 0.52 & 0.41 & 0.46 & 80  \\
+      2 & 0.43 & 0.29 & 0.35 & 31  \\
+      3 & 1.00 & 0.60 & 0.75 & 5   \\
+    \end{tabular}
+  \end{center}
+\end{table}
+
+\section{Training with data augmentation}
+
 \begin{figure}
   \begin{center}
     \includegraphics[width=100mm]{img/overfitted.png}
@@ -343,29 +418,18 @@ The CNN used by \textcite{islam2018early} uses a densely connected architecture 
   \caption{Selected filter visualizations from the first three convolution layers.}
 \end{figure}
 
-The learning rate of the Adam optimizer was found to be very important for good results. The default learning rate of $0.001$ appears to be to large, and the result was the network not improving. A lower rate of $10^{-5}$ resulted in more and faster improvement during training.
-
-\section{Initial training}
-At first, the network reached an accuracy of around 78~\% in a single epoch. Further training did not let the network progress.
-Training the data with all classes equally, results in the op
-
-Validating on 555 images...
-              precision    recall  f1-score   support
-
-           0       0.85      0.88      0.86       422
-           1       0.39      0.32      0.35        96
-           2       0.30      0.29      0.29        35
-           3       0.00      0.00      0.00         2
-
-   micro avg       0.74      0.74      0.74       555
-   macro avg       0.38      0.37      0.38       555
-weighted avg       0.73      0.74      0.74       555
-
 \chapter{Discussion}
 Just as in the study by \textcite{islam2018early}, the low frequency of samples in the dataset showing progressed dementia is an issue. Thanks to OASIS-3 containing many times the number of MRI images as the original OASIS does, this is not too large of a problem during training, The low frequency is however very noticible during validation, when it results in single-digit counts of the rarest class (\textit{moderate dementia}). This gives very rough knowledge of how accurate the model actually is on this type of data. It might be useful to increase the ratio of validation to training data, and in the long term create new and larger datasets that enables researchers to evaluate their models' performance with more confidence. On the other hand, detecting these progressed cases of dementia might no be very useful in practice, since by then the symptoms will be so pronounced that the diagnosis can not be missed.
 
 \section{Method}
 \section{Results}
+\subsection{Default training}
+When training without weighting the classes differently, the network starts out with an accuracy of just below 80~\%. The training data mostly contains images of cognitively normal brains, at a rate of $\frac{1724}{2162} \approx 79.7~\%$. This suggests that the network quickly learns to classify everything as this class, for large and quick gains in accuracy which will just as quickly decrease the loss. Inspection of the output reveals that yes, this is actually the case the first few epochs. However, after training some more the network begins to try and also classify the other classes, managing a precision ranging from 30~\% to 50~\% on the three demented classifications. The accuracy steadily decreases as the classes get rarer, most likely because the loss function doesn't encourage exploration in order to get better on them. Since all input samples are weighted equally in the eyes of the loss function, performance on the ca.\ 20 images showing moderate dementia is worth 100 times less than the performance on the ca.\ \num{2000} images showing no dementia. If getting better on the rare classes means getting slightly worse on the dominating one, it won't happen.
+
+\subsection{Class-weighted training}
+
+
+\subsection{Training with data augmentation}
 
 \chapter{Conclusions}
 
