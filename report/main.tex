@@ -6,13 +6,15 @@
 \usepackage{booktabs}
 \usepackage{caption}
 \usepackage{csquotes} % Recommended by biblatex
+\usepackage[super]{nth}
 \usepackage{relsize}
+\usepackage{siunitx}
 \usepackage{subcaption}
 \usepackage{wrapfig}
 
 \addbibresource{references.bib} % The file containing our references, in BibTeX format
 \renewcommand{\arraystretch}{1.2}
-\newcommand{\source}[1]{\caption*{Source: {#1}} }
+\newcommand{\source}[1]{\vspace{-5mm}\caption*{\textcolor{darkgray}{Author: {#1}}\vspace{-7mm}} }
 \captionsetup[table]{skip=10pt}
 
 \title{Evaluating a simple convolutional neural network for classifying Alzheimer's disease}
@@ -55,6 +57,8 @@
 \end{otherlanguage}
 
 
+\setcounter{secnumdepth}{2}
+\setcounter{tocdepth}{2}
 \tableofcontents
 
 
@@ -152,13 +156,69 @@ To train a neural network, we want to change the weights and biases (the network
 
 Because of this a variant of gradient descent named \textit{stochastic} gradient descent (SGD) is sometimes used, where the gradient is calculated using only a single training example at a time. This makes updates to the parameters much faster, but also causes the error function to jump around. This fluctuation adds noise, but also helps the model to not get stuck in local minima. SGD also has the benefit of allowing online learning, where the network can train on new data as it becomes available. In addition the overhead of calculating the gradient this many times might have a negative influence on the final perfomance~\cite{gradient_descent}.
 
-There is also a third option, \textit{mini-batch} gradient descent, which aims to combine the best of both batch and stochastic gradient descent. Here the gradient calculation is performed on \textit{mini-batches} of $n$ training examples. This can help by making the updates more stable, and also helps with utilizing optimized matrix libraries that enables quickly calculating the gradient for a mini-batch. This is the method typically used when training neural networks in practice, and the term SGD is usually used to refer to this method as well.
+There is also a third option, \textit{mini-batch} gradient descent, which aims to combine the best of both batch and stochastic gradient descent. Here the gradient calculation is performed on \textit{mini-batches} of $n$ training examples. This can help by making the updates more stable, and also helps with utilizing optimized matrix libraries that enables quickly calculating the gradient for a mini-batch. This is the method typically used when training neural networks in practice, and the term SGD is usually used to refer to this method as well~\cite{gradient_descent}.
 
-\subsubsection{Backpropagation}
+\subsubsection{Learning rate}
+The learning rate is a parameter that determines how large steps should be taken when performing the gradient descent. Too large a learning rate, and the network will not converge. Too small, and the convergence will take too long. A common strategy is to keep decreasing the learning rate as training progresses~\cite{Bottou2012}.
 
 \subsection{Convolutional neural networks}
 
-\subsection{Gradient ascent in input space}
+\subsubsection{Motivation}
+One of the largest limitations of traditional artificial neural networks is that they struggle with the complexity of images. The input of a grayscale image of just $112 \times 112$ pixels require \num{12544} connections for every neuron in the first hidden layer! This means that the network has to have a very large number of parameters, which results in training of the network becoming very computationally demanding, as well as increasing the chances of overfitting. A model with fewer parameters to train makes overfitting less likely, which improves the network's performance~\cite{cnnIntro}.
+
+\subsubsection{Structure}
+Convolutional neural networks (CNNs) are specifically designed to work with images as input, and therefore has a different structure than traditional neural networks.
+The neurons in a layer are not connected to the all neurons in the preceding layer, instead only connecting to a small region of it.
+CNNs have three different types of layers: \textit{convolutional} layers, \textit{pooling} layers, and \textit{fully-connected} layers.
+The layers are said to have three dimensions: height, width, and depth. The initial height and width correspond to the input image dimensions, while the depth represents different \textit{feature maps}.
+If the images the network trains on are grayscale and has size $112 \times 112$, the input `volume' will have the dimension $(112, 112, 3)$~\cite{cnnIntro}.
+
+\subsubsection{Convolutional layers}
+Convolutional layers consists of a number of different \textit{filters}. These filters usually have small dimensions, say $(3, 3)$, but works on the entire depth of the input and are used to sweep, or \textit{convolve}, over the input's width and height. A $3 \times 3$ filter would have $3 \times 3 \times depth$ adjustable parameters, which forms the filter's \textit{kernel}. The output value, which will be located at the pixel in the center of the filter, is the dot product of the kernel and the current input region~\cite{cnnIntro}. For an illustration of this see Figure~\ref{fig:cnn_color_filter}.
+
+\begin{figure}
+  \begin{center}
+    \includegraphics[width=100mm]{img/cnn_color_filter.png}
+    \caption{Illustration of a filter on a color image.}
+    \source{Cecbur / CC-BY-SA 4.0.}
+    \label{fig:cnn_color_filter}
+  \end{center}
+\end{figure}
+
+The depth of a layer's output volume in the CNN can be increased by increasing the number of filters used. The filters can pick up on different features, of which the intensity in different regions of the image will be outputted in the different depth dimensions, and picked up by later layers.
+
+Another parameter that can be adjusted for the layer is the \textit{stride}. A stride of $1$ means that the filter is moved one step at a a time, while a higer stride of $n$ can be used to make the filter only evaluate every $n^{\text{th}}$ possible possition. This reduces overlap, but has the benefit of shrinking the output volume.
+
+For filters of size larger than $1 \times 1$, the output will have slightly smaller dimensions since the filter can't go outside the edge of the input. To avoid missing features on the edges, \textit{zero-padding} is often used. This pads the input volume with enough zeroes to make the output volume the correct size, enabling the filter to be positioned right on the edge~\cite{cnnIntro}.
+
+\subsubsection{Pooling layers}
+A different way of shrinking the layers' spatial dimension are \textit{pooling layers}. These are used to gradually reduce the representation's dimensionality, which reduces the total amount of parameters that need to be trained. The most common method is by using $2\times 2$ max-pooling layer. This is applied with stride 2 on the input volume, shrinking the output width and height by 2 and reducing the total output size to 25~\%. As the name implies, the output value is simply the maximum of the input values in the region as shown in Figure~\ref{fig:max_pooling}. Pooling retains the number of depth dimensions~\cite{cnnIntro}.
+
+\begin{figure}
+  \begin{center}
+    \includegraphics[width=80mm]{img/max_pooling.png}
+    \caption{Example of max pooling.}
+    \source{Aphex34 / CC-BY-SA 4.0.}
+    \label{fig:max_pooling}
+  \end{center}
+\end{figure}
+
+\subsubsection{Fully-connected layers}
+The fully connected layers work just like they do in traditional neural networks, and are often placed at the end of a CNN network. This lets them compact all the data in the final volume into the final output of the network.
+
+\subsubsection{Common architectures}
+Commonly a CNN is constructed by stacking pairs of convolutional and pooling layers, before finally ending with fully-connected layers. This convolutional outputs are passed through the rectifier activation function. Another common option is to have two convolution layers before the pooling layers. This is recommended since it allows the network to learn more complicated features. The general trend in the layer volume dimensions is that they become smaller but deeper towards the end of the network~\cite{cnnIntro}. For an illustration of a complete CNN architecture, see Figure~\ref{fig:typical_cnn}.
+
+\begin{figure}
+  \begin{center}
+    \includegraphics[width=150mm]{img/typical_cnn.png}
+    \caption{Illustration of a typical CNN architecture.}
+    \source{Aphex34 / CC-BY-SA 4.0.}
+    \label{fig:typical_cnn}
+  \end{center}
+\end{figure}
+
+\subsubsection{Gradient ascent in input space}
 
 \section{Previous work}
 Zhang and co.
@@ -168,12 +228,12 @@ This was done using a version of a convolutional neural network (CNN) trained on
 
 I will in this study recreate the convolutional neural network used in the second study by Islam and Zhang
 
-OASIS-3 is a longitudinal neuroimaging dataset, with data collected over the course of 30 years from 1098 participants in various projects. Of these participants 809 were cognitively normal adults, while 489 were at various stages of cognitive decline. Accompanying the neural imaging is (among other things) clinical assessments of cognitive function~\cite{oasis3}. I will use the T1-weighted brain scans and evaluations using the CDR system. The dataset in total contains 3393 T1-weighted MRI images and 4089 different CDR evaluations.
+OASIS-3 is a longitudinal neuroimaging dataset, with data collected over the course of 30 years from 1098 participants in various projects. Of these participants 809 were cognitively normal adults, while 489 were at various stages of cognitive decline. Accompanying the neural imaging is (among other things) clinical assessments of cognitive function~\cite{oasis3}. I will use the T1-weighted brain scans and mental assessments which were done using the CDR system. The dataset in total contains 3393 T1-weighted MRI images and 4089 different CDR evaluations.
 
 \section{Labeling}
 I will use the assessment of the subjects CDR score to label every MRI image with the stage of dementia. However, since OASIS-3 is a longitudinal study, the MRI scans and the clinical assessments were not performed at the same time. In fact, the time between MRI scans and the closest CDR assessment can be relatively large ($\mu=116$, $\sigma=107$). The distribution is shown in Figure~\ref{fig:mri_cdr_offset}. For most of the data the time from an MRI scan to the closest CDR assessment is less than 200 days, while for some images the delay can be several hundred days.
 
-To try to get reasonable CDR labels even when the time offsets are high I will use a linear interpolation of the two closest CDR assessments and the time of the MRI scan, when this is possible. If the MRI scan was done either before or after all of this subjects' CDR assessments I will simply use the closest one.
+To try to get reasonable CDR labels even when the time offsets are high, a linear interpolation of the two closest CDR assessments and the time of the MRI scan will be used when this is possible. If the MRI scan was done either before or after all of this subjects' CDR assessments, the MRI scan will simply be tagged with the closest one.
 
 The CDR calculation can be written as follows:
 \begin{flalign*}
