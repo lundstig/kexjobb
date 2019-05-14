@@ -7,6 +7,7 @@
 \usepackage{caption}
 \usepackage{csquotes} % Recommended by biblatex
 \usepackage[super]{nth}
+\usepackage{float}
 \usepackage{relsize}
 \usepackage{siunitx}
 \usepackage{subcaption}
@@ -16,7 +17,10 @@
 \renewcommand{\arraystretch}{1.2}
 \newcommand{\source}[1]{\vspace{-5mm}\caption*{\textcolor{darkgray}{Author: {#1}}\vspace{-7mm}} }
 \captionsetup[table]{skip=10pt}
-\title{Evaluating a simple convolutional neural network for classifying Alzheimer's disease} \alttitle{Utvärdering av ett enkelt CNN-nätverk för klassifiering av Alzheimers sjukdom}
+\restylefloat{table}
+
+\title{Evaluating a convolutional neural network model for classifying Alzheimer's disease}
+\alttitle{Utvärdering av ett CNN-nätverk för klassifiering av Alzheimers sjukdom}
 \author{Karl Lundstig}
 \email{lundsti@kth.se}
 \supervisor{Jeanette Hällgren Kotaleski}
@@ -65,36 +69,36 @@
 
 \chapter{Introduction}
 
-In the last couple of years machine learning and specifically deep learning have been applied successfully on several problems such as speech recognition, image recognition \parencite{krizhevsky2012imagenet}, and even board games \parencite{silver2018general}. One area which could benefit greatly from effective image recognition and analysis is medical diagnostics.
+In the last couple of years machine learning and specifically deep learning have been applied successfully on several problems. These problems cover various areas, such as speech recognition, image recognition \parencite{krizhevsky2012imagenet}, and even board games \parencite{silver2018general}. One area which could benefit greatly from effective image recognition and analysis is medical diagnostics.
 
 Alzheimer’s Disease (AD) is a neurodegenerative disease that is the leading cause of dementia. There is currently no cure, but early detection is still important as it can be beneficial to the patient~\cite{factsfigures2018}.
 
-Many studies~\cite{islam2017novel, islam2018early} shows promising results for identifying and classifying Alzheimer’s Disease using structural MRI data, using mainly the OASIS\cite{oasis} or ADNI\cite{adni} datasets.
+Many studies~\cite{islam2017novel, islam2018early} shows promising results for identifying and classifying Alzheimer’s Disease using structural MRI data. These studies are mainly performed on the OASIS~\cite{oasis} or ADNI~\cite{adni} datasets.
 
 \section{Research Question}
 This study will not try to acheive state-of-the-art results on Alzheimer's disease diagnosis; instead the goal is to evaluate the performance of a simple CNN model on medical data when using various training schemes. The model's accuracy will be measured starting from the simplest strategy, and then various improvements will be incrementally added and evaluated.
-
-\section{Acknowledgments}
-Data were provided by OASIS-3: Principal Investigators: T. Benzinger, D. Marcus, J. Morris; NIH P50AG00561, P30NS09857781, P01AG026276, P01AG003991, R01AG043434, UL1TR000448, R01EB009352. AV-45 doses were provided by Avid Radiopharmaceuticals, a wholly owned subsidiary of Eli Lilly.
 
 \chapter{Background}
 
 \section{Alzheimer's Disease}
 
-Dementia is a group of symptoms that may have many different causes. Alzheimer's disease is a degenerative brain disease, estimated to be the cause of 60\% to 80\% of dementia cases. In half of these cases Alzheimer's is the only cause, while many other also have evidence of other dementia causing changes~\cite{factsfigures2018}.
-
-Early (and accurate) diagnosis of Alzheimer's disease has several benefits. Those who do not have Alzheimer's but are diagnosed with mild cognitive impairment, might after testing realize that they're suffering from some other, treatable condition. There are also medical and social benefits to get an Alzheimer's diagnosis early. Neither a curing nor a slowing treatment exist, but individuals can still take measures to retain ther cognitive function for as long as possible. Aerobic exercise, mental activity and social engagement may help delay cognitive decline, while medication and other intervention can help with managing symptoms. An early diagnosis can also help reduce anxiety by giving the noticed symptoms a name, for both affected individuals and their family members. Finally, early diagnosis gives individuals time to make plans for the future while still having good cognitive function~\cite[p. 406-409]{factsfigures2018}.
+Dementia is a group of symptoms that may have many different causes. Alzheimer's disease is a degenerative brain disease, estimated to be the cause of 60\% to 80\% of dementia cases. For half of these cases Alzheimer's is the only cause, while many other also have evidence of other changes causing dementia~\cite{factsfigures2018}.
 
 \subsection{Symptoms}
-Individuals with Alzheimer's disease can experience multiple and varying symptoms, which change over several years~\cite{factsfigures2018}.
+Individuals with Alzheimer's disease can experience multiple symptoms, which can vary over the course of the illness~\cite{factsfigures2018}. There are several benefits to early detection of the disease.
 
 \subsection{Benefits of early detection}
 Early (and accurate) diagnosis of Alzheimer's disease has several benefits. Those who do not have Alzheimer's but are diagnosed with mild cognitive impairment, might after testing realize that they're suffering from some other, treatable condition. There are also medical and social benefits to get an Alzheimer's diagnosis early. Neither a curing nor a slowing treatment exist, but individuals can still take some measures that helps them retain their cognitive function for as long as possible. Aerobic exercise, mental activity and social engagement may help delay cognitive decline, while medication and other intervention can help with managing symptoms. An early diagnosis can also help reduce anxiety by giving noticed symptoms a name, for both affected individuals and their family members. Finally, early diagnosis gives individuals time to make plans for the future while still having good cognitive function~\cite[p. 406-409]{factsfigures2018}.
 
 \subsection{Brain changes}
-The abnormal accumulation of two proteins (what is called beta-amyloid plaques and tau tangles) inside the brain is one of several brain changes associated with Alzheimer's disease. These proteins interfer with neuron communication and nutrient transportation, while also triggering inflammation. Brain shrinkage, or \textit{atrophy,} eventually occurs because of cell loss. These changes may start as early as 20 years or more before symptoms appear~\cite{factsfigures2018}.
+\begin{figure}
+  \centering
+  \includegraphics[width=0.9\linewidth]{img/mri_scan.png}
+  \caption{The three planes of a brain MRI scan.}
+\end{figure}
+The abnormal accumulation of two proteins (into what is called beta-amyloid plaques and tau tangles) inside the brain is one of several brain changes associated with Alzheimer's disease. These proteins interfer with neuron communication and nutrient transportation, while also triggering inflammation. Brain shrinkage, or \textit{atrophy,} eventually occurs due to cell loss. These protein changes may start as early as 20 years or more before symptoms appear~\cite{factsfigures2018}.
 
-Brain atrophy occurs in a relatively late disease stage, when neurodegeneration has started to occur. This atrophy can be detected and measured using MRI imaging, and is a medically established predictor of an individual progressing from mild cognitive impairement to Alzheimer's disease. In addition there seems to be a direct relationship between the severity of the atrophy and time-to-dementia. Brain atrophy is, however, not a unique sign of Alzheimer's but a measure of neural degeneration in general, degeneration which might be caused by other conditions~\cite{jack2010brain}.
+Brain atrophy occurs in a relatively late disease stage, when neurodegeneration has started to occur. This can be detected and measured using MRI imaging. Atrophy is a medically established predictor of an individual progressing from mild cognitive impairement to Alzheimer's disease. In addition, there seems to be a direct relationship between the severity of the atrophy and time-to-dementia. Brain atrophy is, however, not a unique sign of Alzheimer's but a measure of neural degeneration in general. Degeneration might be caused by other conditions~\cite{jack2010brain}.
 
 \subsection{Clinical dementia rating}
 Clinical dementia rating (CDR) is a mesure of
@@ -205,7 +209,7 @@ A different way of shrinking the layers' spatial dimension are \textit{pooling l
 The fully connected layers work just like they do in traditional neural networks, and are often placed at the end of a CNN network. This lets them compact all the data in the final volume into the final output of the network.
 
 \subsubsection{Common architectures}
-Commonly a CNN is constructed by stacking pairs of convolutional and pooling layers, before finally ending with fully-connected layers. This convolutional outputs are passed through the rectifier activation function. Another common option is to have two convolution layers before the pooling layers. This is recommended since it allows the network to learn more complicated features. The general trend in the layer volume dimensions is that they become smaller but deeper towards the end of the network~\cite{cnnIntro}. For an illustration of a complete CNN architecture, see Figure~\ref{fig:typical_cnn}.
+Commonly a CNN is constructed by stacking pairs of convolutional and pooling layers, before finally ending with fully-connected layers. This convolutional outputs are passed through the rectifier activation function. Another common option is to have two convolution layers before the pooling layers. This is recommended since it allows the network to learn more complicated features. The general trend in the layer volume dimensions is that they become smaller but deeper towards the end of the network~\cite{cnnIntro}. For an illustration of a typical complete CNN architecture, see Figure~\ref{fig:typical_cnn}.
 
 \begin{figure}
   \begin{center}
@@ -217,6 +221,11 @@ Commonly a CNN is constructed by stacking pairs of convolutional and pooling lay
 \end{figure}
 
 \subsubsection{Gradient ascent in input space}
+
+\section{Evaluation of classification systems}
+\subsection{Precision}
+\subsection{Recall}
+\subsection{F1-Score}
 
 \section{Previous work}
 Zhang and co.
@@ -319,7 +328,7 @@ A few different training methods for the CNN network will be tried and evaluated
 
 \chapter{Results}
 
-The learning rate of the Adam optimizer was found to be very important for good results. The default learning rate of $0.001$ appears to be to large, and the result was the network not improving. A lower rate of $10^{-5}$ resulted in more and faster improvement during training.
+The learning rate of the Adam optimizer was found to be very important for good results. The default learning rate of $0.001$ appears to be to large, and resulted in the network not improving. A lower rate of $10^{-5}$ resulted in better and quicker results during training.
 
 \section{Default training}
 
@@ -336,7 +345,7 @@ The learning rate of the Adam optimizer was found to be very important for good 
   \caption{Accuracy during training with the default training scheme.}
 \end{figure}
 
-\begin{table}[h]
+\begin{table}[H]
   \begin{center}
     \caption{Results for default training. \label{tab:results_class_weighted}}
     \begin{tabular}{r|ccc|c}
@@ -352,8 +361,9 @@ The learning rate of the Adam optimizer was found to be very important for good 
 \begin{figure}
   \centering
   \includegraphics[width=0.9\linewidth]{img/loss_class_weighted.pdf}
-  \label{fig:loss_default}
   \caption{Loss during training with class-weighting.}
+  \label{fig:loss_default}
+  \vspace{-30mm}
 \end{figure}
 \begin{figure}
   \centering
@@ -363,7 +373,7 @@ The learning rate of the Adam optimizer was found to be very important for good 
 \end{figure}
 
 \section{Class-weighted training}
-\begin{table}[h]
+\begin{table}[H]
   \begin{center}
     \caption{Results for class-weighted training. \label{tab:results_class_weighted}}
     \begin{tabular}{r|ccc|c}
@@ -379,21 +389,22 @@ The learning rate of the Adam optimizer was found to be very important for good 
 
 \section{Training with data augmentation}
 
-\begin{figure}
-  \begin{center}
-    \includegraphics[width=100mm]{img/overfitted.png}
-    \label{fig:overfitted}
-    \caption{The result when training the network for 1000 epochs without data augmentation. (Note log scale on left diagram.)}
-  \end{center}
-\end{figure}
-\begin{figure}
-  \begin{center}
-    \includegraphics[width=100mm]{img/overfitted_acc.png}
-    \label{fig:overfitted_acc}
-    \caption{The result when training the network for 1000 epochs without data augmentation. (Note log scale on left diagram.)}
-  \end{center}
-\end{figure}
 
+\begin{table}[H]
+  \begin{center}
+    \caption{Results for class-weighted training. \label{tab:results_class_weighted}}
+    \begin{tabular}{r|ccc|c}
+      \textbf{CDR Class} & \textbf{Precision} & \textbf{Recall} & \textbf{f1-Score} & \textbf{Support} \\
+      \toprule
+           0    &  0.89   &  0.74   &  0.81    &  440 \\
+           1    &  0.28   &  0.36   &  0.32    &   80 \\
+           2    &  0.22   &  0.26   &  0.24    &   31 \\
+           3    &  0.04   &  0.40   &  0.07    &    5 \\
+    \end{tabular}
+  \end{center}
+\end{table}
+
+\section{Filter visualizations}
 \begin{figure}
   \begin{subfigure}{.5\textwidth}
     \centering
@@ -422,16 +433,22 @@ The learning rate of the Adam optimizer was found to be very important for good 
 Just as in the study by \textcite{islam2018early}, the low frequency of samples in the dataset showing progressed dementia is an issue. Thanks to OASIS-3 containing many times the number of MRI images as the original OASIS does, this is not too large of a problem during training, The low frequency is however very noticible during validation, when it results in single-digit counts of the rarest class (\textit{moderate dementia}). This gives very rough knowledge of how accurate the model actually is on this type of data. It might be useful to increase the ratio of validation to training data, and in the long term create new and larger datasets that enables researchers to evaluate their models' performance with more confidence. On the other hand, detecting these progressed cases of dementia might no be very useful in practice, since by then the symptoms will be so pronounced that the diagnosis can not be missed.
 
 \section{Method}
+It is debatable exactly what good performance is in computed-aided medical diagnostics. Is it important that the 
+
 \section{Results}
 \subsection{Default training}
-When training without weighting the classes differently, the network starts out with an accuracy of just below 80~\%. The training data mostly contains images of cognitively normal brains, at a rate of $\frac{1724}{2162} \approx 79.7~\%$. This suggests that the network quickly learns to classify everything as this class, for large and quick gains in accuracy which will just as quickly decrease the loss. Inspection of the output reveals that yes, this is actually the case the first few epochs. However, after training some more the network begins to try and also classify the other classes, managing a precision ranging from 30~\% to 50~\% on the three demented classifications. The accuracy steadily decreases as the classes get rarer, most likely because the loss function doesn't encourage exploration in order to get better on them. Since all input samples are weighted equally in the eyes of the loss function, performance on the ca.\ 20 images showing moderate dementia is worth 100 times less than the performance on the ca.\ \num{2000} images showing no dementia. If getting better on the rare classes means getting slightly worse on the dominating one, it won't happen.
+When training without weighting the classes differently, the network starts out with an accuracy of just below 80~\%. The training data mostly contains images of cognitively normal brains, at a rate of $\frac{1724}{2162} \approx 79.7~\%$. This suggests that the network quickly learns to classify everything as this class, for a large and quick gain in accuracy which will just as quickly decrease the loss. Inspection of the output reveals that yes, this is actually the case the first few epochs. However, after training some more the network begins to try and also classify the other classes, managing a precision ranging from 30~\% to 50~\% on the three demented classifications. The accuracy steadily decreases as the classes get rarer, most likely because the loss function doesn't encourage exploration in order to get better on them. Since all input samples are weighted equally in the eyes of the loss function, performance on the ca.\ 20 images showing moderate dementia is worth 100 times less than the performance on the ca.\ \num{2000} images showing no dementia. If getting better on the rare classes means getting slightly worse on the dominating one, it won't happen.
 
 \subsection{Class-weighted training}
 
 
 \subsection{Training with data augmentation}
 
+
 \chapter{Conclusions}
+
+\chapter{Acknowledgments}
+Data were provided by OASIS-3: Principal Investigators: T. Benzinger, D. Marcus, J. Morris; NIH P50AG00561, P30NS09857781, P01AG026276, P01AG003991, R01AG043434, UL1TR000448, R01EB009352. AV-45 doses were provided by Avid Radiopharmaceuticals, a wholly owned subsidiary of Eli Lilly.
 
 % Print the bibliography (and make it appear in the table of contents)
 \printbibliography[heading=bibintoc]
