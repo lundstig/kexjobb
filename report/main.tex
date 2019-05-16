@@ -5,11 +5,13 @@
 \usepackage[style=numeric,sorting=none,backend=biber]{biblatex}
 \usepackage{booktabs}
 \usepackage{caption}
+\usepackage{color}
 \usepackage{csquotes} % Recommended by biblatex
 \usepackage[super]{nth}
 \usepackage{float}
 \usepackage{relsize}
 \usepackage{siunitx}
+\usepackage{soul}
 \usepackage{subcaption}
 \usepackage{wrapfig}
 
@@ -220,16 +222,45 @@ Commonly a CNN is constructed by stacking pairs of convolutional and pooling lay
   \end{center}
 \end{figure}
 
-\subsubsection{Gradient ascent in input space}
+\subsubsection{Visualizing filters}
+\textit{Gradient ascent in input space}
+\hl{TODO: Explain this as it's the source of visualizations}
 
 \section{Evaluation of classification systems}
-\subsection{Precision}
-\subsection{Recall}
-\subsection{F1-Score}
+To evaluate a classification system an objective scoring method is needed. The most common method uses the two values \textit{precision} and \textit{recall}, together with the combined measure \textit{F1-score}. These can be calculated from the the number of true positives (TP), true negatives (TN), false positives (FP), and false negatives (FN).
+
+\begin{table}[H]
+  \begin{center}
+    \begin{tabular}{cc}
+      \textbf{Name} & \textbf{Meaning} \\
+      \toprule
+      TP & Hits, count of correct identifications. \\
+      TN & Count of correct rejections. \\
+      FP & False alarms, count of incorrect identifications. \\
+      FN & Misses, count of incorrect rejections.
+    \end{tabular}
+  \end{center}
+\end{table}
+
+\subsubsection{Precision}
+In the context of classification, the fraction of guesses on a certain class that is correct is said to be the \textit{precision} of the model on this class~\cite[p.~5]{irbook}.
+\[ P = \frac{\text{TP}}{\text{TP} + \text{FP}} \]
+
+\subsubsection{Recall}
+In the context of classification, the fraction of instances of class which are correctly identified is said to be the \textit{accuracy} of the model on this class~\cite[p.~5]{irbook}. This is also known as \textit{sensitivity}.
+\[ R = \frac{\text{TP}}{\text{TP} + \text{FN}} \]
+
+\subsubsection{F1-Score}
+The F1-score can be used to combine the precision and recall scores into a single measure. It is defined to be the harmonic mean of precision and recall~\cite[p.~156-167]{irbook}:
+\[ F_1 = \frac{2PR}{P + R} \]
 
 \section{Previous work}
+\hl{TODO: Fill this in with more studies to compare to}
+\subsubsection{Islam and Zhang}
 Zhang and co.
 This was done using a version of a convolutional neural network (CNN) trained on the OASIS dataset \parencite{oasis}. While their model showed acceptable performance for identifying non-demented patients, its performance on classifying demented patients was significantly worse, which could be because of the limited number of samples.
+
+The CNN used by \textcite{islam2018early} uses a densely connected architecture that seems identical to DenseNet~\cite{huang2017densely}. DenseNet has implementations for both Tensorflow and PyTorch. A dense architecture means that each layer in the network is not just connected to the previous layer, but also to every other layer that came before it. This can speed up training and reduce overfitting by shrinking the parameter space and providing more direct connections between different parts of the network.
 
 \chapter{Methods}
 
@@ -238,9 +269,9 @@ I will in this study recreate the convolutional neural network used in the secon
 OASIS-3 is a longitudinal neuroimaging dataset, with data collected over the course of 30 years from 1098 participants in various projects. Of these participants 809 were cognitively normal adults, while 489 were at various stages of cognitive decline. Accompanying the neural imaging is (among other things) clinical assessments of cognitive function~\cite{oasis3}. I will use the T1-weighted brain scans and mental assessments which were done using the CDR system. The dataset in total contains 3393 T1-weighted MRI images and 4089 different CDR evaluations.
 
 \section{Labeling}
-I will use the assessment of the subjects CDR score to label every MRI image with the stage of dementia. However, since OASIS-3 is a longitudinal study, the MRI scans and the clinical assessments were not performed at the same time. In fact, the time between MRI scans and the closest CDR assessment can be relatively large ($\mu=116$, $\sigma=107$). The distribution is shown in Figure~\ref{fig:mri_cdr_offset}. For most of the data the time from an MRI scan to the closest CDR assessment is less than 200 days, while for some images the delay can be several hundred days.
+I will use the assessment of the subjects' CDR score to label every MRI image with the stage of dementia. However, since OASIS-3 is a longitudinal study, the MRI scans and the clinical assessments were not performed at the same time. In fact, the time between MRI scans and the closest CDR assessment can be relatively large ($\mu=116$, $\sigma=107$). The distribution is shown in Figure~\ref{fig:mri_cdr_offset}. For most of the data the time from an MRI scan to the closest CDR assessment is less than 200 days, while for some images the delay can be several hundred days.
 
-To try to get reasonable CDR labels even when the time offsets are high, a linear interpolation of the two closest CDR assessments and the time of the MRI scan will be used when this is possible. If the MRI scan was done either before or after all of this subjects' CDR assessments, the MRI scan will simply be tagged with the closest one.
+To try to get reasonable CDR labels even when the time differences are high, a linear interpolation of the two closest CDR assessments considering the time of the MRI scan will be used when this is possible. If the MRI scan was done either before or after all of this subject's CDR assessments, the MRI scan will simply be tagged with the closest one.
 
 The CDR calculation can be written as follows:
 \begin{flalign*}
@@ -271,7 +302,7 @@ During the preprocessing step the three image planes are extracted from each MRI
 Some scans are rotated the wrong way, even after realigning the images when loading. These images are simply skipped for now.
 
 \section{Dataset contents}
-The dataset in total contains 2782 images (ignoring the wrongly rotated ones). Of these images 20~\% were selected to be used as validation data, while the other 80~\% will be used to train the network. Just as in the paper by \textcite{islam2018early} I will use the CDR scores to divide the images into four classes: \textit{non-demented}, \textit{very mild dementia}, \textit{mild dementia}, and \textit{moderate dementia}. These classes are not equally represented in the dataset, with the more serious dementia cases being much less frequent. The total count of each case is shown in Table~\ref{tab:dataset_contents}, with the count in training and verification broken out.
+The dataset in total contains 2782 images (ignoring the wrongly rotated ones). Of these images 20~\% were selected to be used as validation data, while the other 80~\% will be used to train the network. Since the network has never seen the validation data during training, it can be used to evaluate it's expected performance on unknown MRI images. Just as in the paper by \textcite{islam2018early} I will use the CDR scores to divide the images into four classes: \textit{non-demented}, \textit{very mild dementia}, \textit{mild dementia}, and \textit{moderate dementia}. These classes are not equally represented in the dataset, with the more serious dementia cases being much less frequent. The total count of each case is shown in Table~\ref{tab:dataset_contents}, with the count in training and verification broken out.
 
 \begin{table}[h]
   \begin{center}
@@ -289,42 +320,36 @@ The dataset in total contains 2782 images (ignoring the wrongly rotated ones). O
   \end{center}
 \end{table}
 
-\newpage
-\section{Network structure}
-\begingroup
-\setlength{\columnsep}{0pt}%
-\setlength\intextsep{0mm}
-\begin{wrapfigure}{l}{0.3\linewidth}
-  % \adjustimage{width=.3\textwidth,left}{img/model.pdf}
-  \hspace*{-30mm}
-  \includegraphics[width=1.7\linewidth]{img/model.pdf}
-\end{wrapfigure}
+% \setlength{\columnsep}{0pt}%
+% \setlength\intextsep{0mm}
+% \begin{wrapfigure}{r}{0.5\linewidth}
+%   % \adjustimage{width=.3\textwidth,left}{img/model.pdf}
+%   \includegraphics[width=0.9\linewidth]{img/model.pdf}
+% \end{wrapfigure}
 
-
-
-\subsubsection{Old stuff, ignore}
-We will recreate the convolutional neural network (CNN) setup used in the study by Islam and Zhang, using the machine learning framework Keras. The network will be trained and evaluated on the OASIS-3 dataset. This dataset contains data from over 2000 MRI sessions and 1000 patients, as well as medical evaluations of their disease state. OASIS-3 was a longitudinal study, which means that the imaging and evaluation of every patient was performed over a large span of time.
-
-The dataset will be split into training, validation, and test sets, as done by Islam and Zhang. The CNN will never have seen the test set, and so it will be used for testing the accuracy. The study by Islam and Zhang resulted in a series of numerical values for accuracy, more specifically precision, recall, and f1 score. We will calculate the same values for our network trained on the larger dataset, and then compare our results with theirs. 
-
-Studies using the smaller OASIS dataset often use cross-validation, where the training and validation is repeated multiple times so that every part of the data is used as validation at some point. This might not be possible for us depending on the computation time needed to train on the larger dataset, but would increase confidence in our results.
-
-The CNN used by \textcite{islam2018early} uses a densely connected architecture that seems identical to DenseNet~\cite{huang2017densely}. DenseNet has implementations for both Tensorflow and PyTorch. A dense architecture means that each layer in the network is not just connected to the previous layer, but also to every other layer that came before it. This can speed up training and reduce overfitting by shrinking the parameter space and providing more direct connections between different parts of the network.
-
-\textcite{islam2018early} do not use the entire 3D images obtained from the MRI scans. Instead, they take three slices of the image along different planes and patch them together into an image, which is then used as input to the model. It would be interesting to see if 3D convolutions could be useful for this problem, this is something we will look into if we have time.
-
+\begin{minipage}{.7\linewidth}
+  \section{Network structure}
+  The network this study is going to evaluate is mostly based on the basic CNN design suggested by \textcite{cnnIntro}, with double convolutional layers joined by pooling layers. The first two layers are taken from \textcite{islam2018early}, and consists of a convolutional layer with filters of size $7 \times 7$ and stride 2, followed by a pooling layer. All the other convolutional layers use filters of size $3 \times 3$. At the end of the network there are 128 fully connected neurons which finally connect into the four output neurons. Each output neuron represents the probabilty of each class. The densely connected layer also uses rectified linear activation, while the output layer uses softmax activation. The network is trained using the Adam optimizer, which is a variant of SGD, and the cross-entropy loss function.
+\\
 \section{Model iterations}
-A few different training methods for the CNN network will be tried and evaluated. The network will train for \num{1000} epochs using each training regime, and the accuracy on the different classes will be measured.
+A few different training methods for the CNN network will be tried out and evaluated. The network will train for \num{1000} epochs using each training regime, and the accuracy on the different classes will be measured. The study by Islam and Zhang resulted in a series of numerical values for accuracy, more specifically precision, recall, and f1 score. We will calculate the same values for our network trained on the larger dataset, and then compare our results with theirs. \hl{TODO: Compare with other studies as well.}
 
 \subsection{Default training}
-
+Here the network will be trained with default training parameters, i.e. each sample inb the trsaining input will be weighted equally in the loss function.
 
 \subsection{Class-weighted training}
+  Since the input data is very skewed, with some classes being much more represented than others, it might be a good idea to weight the classes to compensate for this, as done in the study by \textcite{islam2018early}. Now the total effect of each class on the loss will be the same. This will be used to see if the results improve.
 
+\end{minipage}
+\begin{minipage}{.3\linewidth}
+  \centering
+  \vspace*{-20mm}
+  \hspace*{0mm}
+  \includegraphics[width=1.8\textwidth]{img/model.pdf}
+\end{minipage}
 
 \subsection{Training with data augmentation}
-
-\endgroup
+When the size of the datasize isn't too large, there is a risk of overfitting. One way to battle this is data augmentation, where the dataset is in some way extended. For this test the images will be mirrored along the along the sagittal axis (right side of the brain will become the left), to make the training data twice as large.
 
 \chapter{Results}
 
@@ -351,10 +376,10 @@ The learning rate of the Adam optimizer was found to be very important for good 
     \begin{tabular}{r|ccc|c}
       \textbf{CDR Class} & \textbf{Precision} & \textbf{Recall} & \textbf{f1-Score} & \textbf{Support} \\
       \toprule
-      0 & 0.88 & 0.91 & 0.89 & 440 \\
-      1 & 0.51 & 0.46 & 0.49 & 80  \\
-      2 & 0.40 & 0.32 & 0.36 & 31  \\
-      3 & 0.33 & 0.20 & 0.25 & 5   \\
+      Non-demented (0.0) & 0.88 & 0.91 & 0.89 & 440 \\
+      Very mild (0.5)    & 0.51 & 0.46 & 0.49 & 80  \\
+      Mild (1.0)         & 0.40 & 0.32 & 0.36 & 31  \\
+      Moderate (2.0)     & 0.33 & 0.20 & 0.25 & 5   \\
     \end{tabular}
   \end{center}
 \end{table}
@@ -379,10 +404,10 @@ The learning rate of the Adam optimizer was found to be very important for good 
     \begin{tabular}{r|ccc|c}
       \textbf{CDR Class} & \textbf{Precision} & \textbf{Recall} & \textbf{f1-Score} & \textbf{Support} \\
       \toprule
-      0 & 0.87 & 0.93 & 0.90 & 440 \\
-      1 & 0.52 & 0.41 & 0.46 & 80  \\
-      2 & 0.43 & 0.29 & 0.35 & 31  \\
-      3 & 1.00 & 0.60 & 0.75 & 5   \\
+      Non-demented (0.0) & 0.87 & 0.93 & 0.90 & 440 \\
+      Very mild (0.5)    & 0.52 & 0.41 & 0.46 & 80  \\
+      Mild (1.0)         & 0.43 & 0.29 & 0.35 & 31  \\
+      Moderate (2.0)     & 1.00 & 0.60 & 0.75 & 5   \\
     \end{tabular}
   \end{center}
 \end{table}
@@ -392,14 +417,14 @@ The learning rate of the Adam optimizer was found to be very important for good 
 
 \begin{table}[H]
   \begin{center}
-    \caption{Results for class-weighted training. \label{tab:results_class_weighted}}
+    \caption{Results with vertical mirroring of data. \label{tab:results_vertical augmentation}}
     \begin{tabular}{r|ccc|c}
       \textbf{CDR Class} & \textbf{Precision} & \textbf{Recall} & \textbf{f1-Score} & \textbf{Support} \\
       \toprule
-           0    &  0.89   &  0.74   &  0.81    &  440 \\
-           1    &  0.28   &  0.36   &  0.32    &   80 \\
-           2    &  0.22   &  0.26   &  0.24    &   31 \\
-           3    &  0.04   &  0.40   &  0.07    &    5 \\
+           Non-demented (0.0) &  0.89   &  0.74   &  0.81    &  440 \\
+           Very mild (0.5)    &  0.28   &  0.36   &  0.32    &   80 \\
+           Mild (1.0)         &  0.22   &  0.26   &  0.24    &   31 \\
+           Moderate (2.0)     &  0.04   &  0.40   &  0.07    &    5 \\
     \end{tabular}
   \end{center}
 \end{table}
@@ -443,7 +468,7 @@ When training without weighting the classes differently, the network starts out 
 
 
 \subsection{Training with data augmentation}
-
+Why is this so disappointing? Bug or result
 
 \chapter{Conclusions}
 
