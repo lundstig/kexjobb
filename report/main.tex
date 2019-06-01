@@ -21,8 +21,8 @@
 \captionsetup[table]{skip=10pt}
 \restylefloat{table}
 
-\title{Evaluating a convolutional neural network model for classifying Alzheimer's disease}
-\alttitle{Utvärdering av ett CNN-nätverk för klassifiering av Alzheimers sjukdom}
+\title{Evaluating different training techniques for a convolutional neural network that classifies Alzheimer's disease}
+\alttitle{Utvärdering av olika träningstekniker för ett CNN-nätverk som klassificerar Alzheimers sjukdom}
 \author{Karl Lundstig}
 \email{lundsti@kth.se}
 \supervisor{Jeanette Hällgren Kotaleski}
@@ -263,9 +263,24 @@ This was done using a version of a convolutional neural network (CNN) trained on
 The CNN used by \textcite{islam2018early} uses a densely connected architecture that seems identical to DenseNet~\cite{huang2017densely}. DenseNet has implementations for both Tensorflow and PyTorch. A dense architecture means that each layer in the network is not just connected to the previous layer, but also to every other layer that came before it. This can speed up training and reduce overfitting by shrinking the parameter space and providing more direct connections between different parts of the network.
 
 \chapter{Methods}
+I will in this report evaluate three different strategies for training a convolutional neural network:
+\begin{enumerate}
+  \item Default training
+  \item Training with equal weighting of the different classes (\textit{class-weighting})
+  \item Training utilizing \textit{data augmentation}
+\end{enumerate}
 
-I will in this study recreate the convolutional neural network used in the second study by Islam and Zhang
+These methods will be trained and evaluated using the OASIS-3 neuroimaging dataset~\cite{oasis}.
 
+\section{Training methods}
+\subsection{Default training}
+\textit{Default training} is the least sophisticated method, and is what would be used by someone who does not put any thought into how the training should work. This is what popular machine learning frameworks will provide by default, and will provide a performance baseline. The other two methods are meant to counter the problems the default training strategy might have in our use case.
+
+\subsection{Class-weighting}
+
+\subsection{Data augmentation}
+
+\section{OASIS-3 dataset}
 OASIS-3 is a longitudinal neuroimaging dataset, with data collected over the course of 30 years from 1098 participants in various projects. Of these participants 809 were cognitively normal adults, while 489 were at various stages of cognitive decline. Accompanying the neural imaging is (among other things) clinical assessments of cognitive function~\cite{oasis3}. I will use the T1-weighted brain scans and mental assessments which were done using the CDR system. The dataset in total contains 3393 T1-weighted MRI images and 4089 different CDR evaluations.
 
 \section{Labeling}
@@ -273,7 +288,7 @@ I will use the assessment of the subjects' CDR score to label every MRI image wi
 
 To try to get reasonable CDR labels even when the time differences are high, a linear interpolation of the two closest CDR assessments considering the time of the MRI scan will be used when this is possible. If the MRI scan was done either before or after all of this subject's CDR assessments, the MRI scan will simply be tagged with the closest one.
 
-The CDR calculation can be written as follows:
+This CDR calculation can be written as follows:
 \begin{flalign*}
   \begin{aligned}
     \text{cdr} &=
@@ -412,25 +427,37 @@ The learning rate of the Adam optimizer was found to be very important for good 
   \end{center}
 \end{table}
 
+
 \section{Training with data augmentation}
-
-
 \begin{table}[H]
   \begin{center}
-    \caption{Results with vertical mirroring of data. \label{tab:results_vertical augmentation}}
+    \caption{Results with data augmentation. \label{tab:results_data_augmentation}}
     \begin{tabular}{r|ccc|c}
       \textbf{CDR Class} & \textbf{Precision} & \textbf{Recall} & \textbf{f1-Score} & \textbf{Support} \\
       \toprule
-           Non-demented (0.0) &  0.89   &  0.74   &  0.81    &  440 \\
-           Very mild (0.5)    &  0.28   &  0.36   &  0.32    &   80 \\
-           Mild (1.0)         &  0.22   &  0.26   &  0.24    &   31 \\
-           Moderate (2.0)     &  0.04   &  0.40   &  0.07    &    5 \\
+           Non-demented (0.0) &  0.91   &  0.77  &   0.83   &   440 \\
+           Very mild (0.5)    &  0.33   &  0.57  &   0.42   &    80 \\
+           Mild (1.0)         &  0.40   &  0.55  &   0.46   &    31 \\
+           Moderate (2.0)     &  0.67   &  0.40  &   0.50   &     5 \\
     \end{tabular}
   \end{center}
 \end{table}
 
-\section{Filter visualizations}
 \begin{figure}
+  \centering
+  \includegraphics[width=0.9\linewidth]{img/loss_data_augmentation.pdf}
+  \caption{Loss during training with data augmentation.}
+  \label{fig:loss_default}
+\end{figure}
+\begin{figure}
+  \centering
+  \includegraphics[width=0.9\linewidth]{img/accuracy_data_augmentation.pdf}
+  \label{fig:accuracy_default}
+  \caption{Accuracy during training with data augmentation.}
+\end{figure}
+
+\section{Filter visualizations}
+\begin{figure}[H]
   \begin{subfigure}{.5\textwidth}
     \centering
     \includegraphics[width=0.9\linewidth]{img/layer0.png}
@@ -452,6 +479,20 @@ The learning rate of the Adam optimizer was found to be very important for good 
   \end{subfigure}
   \label{fig:filtervis}
   \caption{Selected filter visualizations from the first three convolution layers.}
+\end{figure}
+
+\section{Summary of training results}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.8\linewidth]{img/precision_comparison.pdf}
+  \label{fig:precision_comparison}
+  \caption{Comparison of the precision resulting from the different training methods.}
+\end{figure}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.8\linewidth]{img/recall_comparison.pdf}
+  \label{fig:recall_comparison}
+  \caption{Comparison of the recall resulting from the different training methods.}
 \end{figure}
 
 \chapter{Discussion}
