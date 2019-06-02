@@ -10,7 +10,8 @@
 \usepackage[super]{nth}
 \usepackage{float}
 \usepackage{relsize}
-\usepackage{siunitx}
+% \usepackage{siunitx}
+\newcommand{\num}[1]{{#1}}
 \usepackage{soul}
 \usepackage{subcaption}
 \usepackage{wrapfig}
@@ -73,7 +74,7 @@
 
 In the last couple of years machine learning and specifically deep learning have been applied successfully on several problems. These problems cover various areas, such as speech recognition, image recognition \parencite{krizhevsky2012imagenet}, and even board games \parencite{silver2018general}. One area which could benefit greatly from effective image recognition and analysis is medical diagnostics.
 
-Alzheimer’s Disease (AD) is a neurodegenerative disease that is the leading cause of dementia. There is currently no cure, but early detection is still important as it can be beneficial to the patient~\cite{factsfigures2018}.
+Alzheimer’s Disease (AD) is a neurodegenerative disease, and the leading cause of dementia. There is currently no cure, but early detection is still important as it can be beneficial to the patient~\cite{factsfigures2018}.
 
 Many studies~\cite{islam2017novel, islam2018early} shows promising results for identifying and classifying Alzheimer’s Disease using structural MRI data. These studies are mainly performed on the OASIS~\cite{oasis} or ADNI~\cite{adni} datasets.
 
@@ -84,10 +85,8 @@ This study will not try to acheive state-of-the-art results on Alzheimer's disea
 
 \section{Alzheimer's Disease}
 
-Dementia is a group of symptoms that may have many different causes. Alzheimer's disease is a degenerative brain disease, estimated to be the cause of 60\% to 80\% of dementia cases. For half of these cases Alzheimer's is the only cause, while many other also have evidence of other changes causing dementia~\cite{factsfigures2018}.
-
-\subsection{Symptoms}
-Individuals with Alzheimer's disease can experience multiple symptoms, which can vary over the course of the illness~\cite{factsfigures2018}. There are several benefits to early detection of the disease.
+Dementia is a group of symptoms that may have many different causes. One common cause is Alzheimer's disease, a degenerative brain disease that is estimated to occur in 60\% to 80\% of dementia cases. In half of these cases of dementia Alzheimer's is the only cause, while many other also have evidence of other changes to the brain~\cite{factsfigures2018}.
+Individuals with Alzheimer's disease can experience multiple symptoms, which can vary over the course of the illness~\cite{factsfigures2018}.
 
 \subsection{Benefits of early detection}
 Early (and accurate) diagnosis of Alzheimer's disease has several benefits. Those who do not have Alzheimer's but are diagnosed with mild cognitive impairment, might after testing realize that they're suffering from some other, treatable condition. There are also medical and social benefits to get an Alzheimer's diagnosis early. Neither a curing nor a slowing treatment exist, but individuals can still take some measures that helps them retain their cognitive function for as long as possible. Aerobic exercise, mental activity and social engagement may help delay cognitive decline, while medication and other intervention can help with managing symptoms. An early diagnosis can also help reduce anxiety by giving noticed symptoms a name, for both affected individuals and their family members. Finally, early diagnosis gives individuals time to make plans for the future while still having good cognitive function~\cite[p. 406-409]{factsfigures2018}.
@@ -103,11 +102,26 @@ The abnormal accumulation of two proteins (into what is called beta-amyloid plaq
 Brain atrophy occurs in a relatively late disease stage, when neurodegeneration has started to occur. This can be detected and measured using MRI imaging. Atrophy is a medically established predictor of an individual progressing from mild cognitive impairement to Alzheimer's disease. In addition, there seems to be a direct relationship between the severity of the atrophy and time-to-dementia. Brain atrophy is, however, not a unique sign of Alzheimer's but a measure of neural degeneration in general. Degeneration might be caused by other conditions~\cite{jack2010brain}.
 
 \subsection{Clinical dementia rating}
-Clinical dementia rating (CDR) is a mesure of
+Clinical dementia rating (CDR) is a score that is used to classify the stage of Alzheimer’s disease.
+\begin{table}[h]
+  \renewcommand{\arraystretch}{1.2}
+  \begin{center}
+    \caption{Clinical dementia rating}
+    \label{tab:cdr_definition}
+    \begin{tabular}{c|ll}
+      \textbf{Score} & \textbf{Class} & \textbf{Description} \\
+      \toprule
+      0.0 & Non-demented & Cognitively normal. \\
+      0.5 & Very mild & \hl{TODO} \\
+      1.0 & Mild & \hl{TODO} \\
+      2.0 & Moderate & \hl{TODO} \\
+    \end{tabular}
+  \end{center}
+\end{table}
 
-\section{Machine learning}
-\subsection{Artificial neural networks}
-\subsubsection{Introduction}
+\hl{TODO: How is it calculated?}
+
+\section{Artificial neural networks}
 Artificial neural networks (ANNs) are computational modeling tools inspired by the neural networks found in biology. ANNs exhibit several information processing characteristics which make them useful for modeling complex real-word problems, among them non-linearity, their ability to handle imprecise information, and their ability to generalize~\cite{ANNFundamentals}. A common machine learning task is \textit{classification}. Here the machine learning algorithm is presented with a dataset containing many datapoints, each having some number of features and an assigned class. The goal of the machine learning model is then to learn a mapping from features to class, such that the model can be applied to new data where the class is unknown. ANNs are often used successfully for this task, but they do have the drawback that the models are opaque, or in other words they can't reason about why they give the output that they do~\cite[p. 3, 8--9]{weiss1990empirical}.
 
 \begin{figure}
@@ -119,14 +133,14 @@ Artificial neural networks (ANNs) are computational modeling tools inspired by t
   \end{center}
 \end{figure}
 
-\subsubsection{Structure}
+\subsection{Structure}
 Artificial neural networks can be constructed in different ways, but the most common is the so called \textit{multi-layer feed-forward neural network}, illustrated in Figure~\ref{fig:mlf}. It consists of neurons ordered into multiple layers, the first layer being the \textit{input layer} and the last one the \textit{output layer}. The layers in between are called \textit{hidden layers}. Each neuron is connected with all the neurons in the next layer, with every connection from neuron $i$ to neuron $j$ having a weight coefficient $w_{ij}$. In addition, every neuron has a threshhold coefficient, or bias $b_i$. Using these coefficients and all the inputs from the previous layer, every neuron produces an output $x_i$, which can be formally written as follows:
 \[x_i = \mathlarger{\varphi}\left(\sum_{j \in \Gamma^{-1}(i)}{w_{ij} \cdot x_j}\right)\]
 
 Here $\Gamma^{-1}(i)$ is notation for the set of all neurons in the previous layer, and $\varphi$ is some \textit{activation function} which squeezes the weighted sum of all input neurons into the range $[0, 1]$, in preparation of passing the output along to the next neuron~\cite{mlfIntro}.j
 
-\subsubsection{Activation functions}
-There are many possible choices for the activation function, but three of the most common ones can be found in Table~\ref{tab:activation_functions}. The softmax activation function is a little different than the others since it doesn't work on only one neuron, but instead on all neurons in the layer. In doing this, the softmax function can ensure that the sum of all the output values are equal to $1$, which is a desirable thing for the output layer when classifying into $K$ different classes. This also allows the use the \textit{cross-entropy error function} (see later section), which seems to give higher accuracy than using the sigmoid function and the \textit{least squares error function}~\cite{dunne1997pairing}.
+\subsection{Activation functions}
+There are many possible choices for the activation function, but three of the most common ones can be found in Table~\ref{tab:activation_functions}. The softmax activation function is a little different than the others since it does not work on only one neuron, but instead on all neurons in the layer. In doing this, the softmax function can ensure that the sum of all the output values are equal to $1$, which is a desirable thing for the output layer when classifying into $K$ different classes. This also allows the use the \textit{cross-entropy error function} (see later section), which seems to give higher accuracy than using the sigmoid function and the \textit{least squares error function}~\cite{dunne1997pairing}.
 
 \begin{table}[h]
   \renewcommand{\arraystretch}{1.2}
@@ -143,7 +157,7 @@ There are many possible choices for the activation function, but three of the mo
   \end{center}
 \end{table}
 
-\subsubsection{Error functions}
+\subsection{Error functions}
 To be able to train our network, we need some way to determine how `bad' a certain output is. This is done using an \textit{error function}, or \textit{loss function}. This function is averaged on the network's output on all training samples. In a classification task, the averaged loss being low means that the network is good at predicting the correct class given a certain input data. If the network performs perfectly, the error function is generally $0$. \textit{Least squares error} is a traditional error function, and if you let $x$ and $\hat{x}$ be the network's output and the wanted output respectively, the least squares error is defined as~\cite{mlfIntro}:
 
 \[ E = \sum_i{\frac{1}{2}(x_i - \hat{x}_i)^2} \] 
@@ -152,7 +166,7 @@ There is however also another error function that was mentioned earlier, the \te
 
 \[ E = \sum_i{\hat{x}_i\left(\frac{x_i}{\hat{x}_i}\right)} \]
 
-\subsubsection{Gradient descent}
+\subsection{Gradient descent}
 \begin{wrapfigure}{r}{0.3\linewidth}
   \includegraphics[width=1.6\linewidth]{img/gradient_descent.png}
 \end{wrapfigure}
@@ -162,22 +176,25 @@ Because of this a variant of gradient descent named \textit{stochastic} gradient
 
 There is also a third option, \textit{mini-batch} gradient descent, which aims to combine the best of both batch and stochastic gradient descent. Here the gradient calculation is performed on \textit{mini-batches} of $n$ training examples. This can help by making the updates more stable, and also helps with utilizing optimized matrix libraries that enables quickly calculating the gradient for a mini-batch. This is the method typically used when training neural networks in practice, and the term SGD is usually used to refer to this method as well~\cite{gradient_descent}.
 
-\subsubsection{Learning rate}
+\subsubsection{ADAM}
+ADAM is a variant of SGD. \hl{TODO}
+
+\subsection{Learning rate}
 The learning rate is a parameter that determines how large steps should be taken when performing the gradient descent. Too large a learning rate, and the network will not converge. Too small, and the convergence will take too long. A common strategy is to keep decreasing the learning rate as training progresses~\cite{Bottou2012}.
 
-\subsection{Convolutional neural networks}
+\section{Convolutional neural networks}
 
-\subsubsection{Motivation}
-One of the largest limitations of traditional artificial neural networks is that they struggle with the complexity of images. The input of a grayscale image of just $112 \times 112$ pixels require \num{12544} connections for every neuron in the first hidden layer! This means that the network has to have a very large number of parameters, which results in training of the network becoming very computationally demanding, as well as increasing the chances of overfitting. A model with fewer parameters to train makes overfitting less likely, which improves the network's performance~\cite{cnnIntro}.
+\subsection{Motivation}
+One of the largest limitations of traditional artificial neural networks is that they struggle with the complexity of images. The input of a grayscale image of just $112 \times 112$ pixels require \num{12544} connections for every neuron in the first hidden layer. This means that the network has to have a very large number of parameters, which results in training of the network becoming very computationally demanding, as well as increasing the chances of overfitting. A model with fewer parameters to train makes overfitting less likely, which improves the network's performance~\cite{cnnIntro}.
 
-\subsubsection{Structure}
+\subsection{Structure}
 Convolutional neural networks (CNNs) are specifically designed to work with images as input, and therefore has a different structure than traditional neural networks.
 The neurons in a layer are not connected to the all neurons in the preceding layer, instead only connecting to a small region of it.
 CNNs have three different types of layers: \textit{convolutional} layers, \textit{pooling} layers, and \textit{fully-connected} layers.
 The layers are said to have three dimensions: height, width, and depth. The initial height and width correspond to the input image dimensions, while the depth represents different \textit{feature maps}.
 If the images the network trains on are grayscale and has size $112 \times 112$, the input `volume' will have the dimension $(112, 112, 3)$~\cite{cnnIntro}.
 
-\subsubsection{Convolutional layers}
+\subsection{Convolutional layers}
 Convolutional layers consists of a number of different \textit{filters}. These filters usually have small dimensions, say $(3, 3)$, but works on the entire depth of the input and are used to sweep, or \textit{convolve}, over the input's width and height. A $3 \times 3$ filter would have $3 \times 3 \times depth$ adjustable parameters, which forms the filter's \textit{kernel}. The output value, which will be located at the pixel in the center of the filter, is the dot product of the kernel and the current input region~\cite{cnnIntro}. For an illustration of this see Figure~\ref{fig:cnn_color_filter}.
 
 \begin{figure}
@@ -195,8 +212,8 @@ Another parameter that can be adjusted for the layer is the \textit{stride}. A s
 
 For filters of size larger than $1 \times 1$, the output will have slightly smaller dimensions since the filter can't go outside the edge of the input. To avoid missing features on the edges, \textit{zero-padding} is often used. This pads the input volume with enough zeroes to make the output volume the correct size, enabling the filter to be positioned right on the edge~\cite{cnnIntro}.
 
-\subsubsection{Pooling layers}
-A different way of shrinking the layers' spatial dimension are \textit{pooling layers}. These are used to gradually reduce the representation's dimensionality, which reduces the total amount of parameters that need to be trained. The most common method is by using $2\times 2$ max-pooling layer. This is applied with stride 2 on the input volume, shrinking the output width and height by 2 and reducing the total output size to 25~\%. As the name implies, the output value is simply the maximum of the input values in the region as shown in Figure~\ref{fig:max_pooling}. Pooling retains the number of depth dimensions~\cite{cnnIntro}.
+\subsection{Pooling layers}
+A different way of shrinking the layers' spatial dimension are \textit{pooling layers}. These are used to gradually reduce the representation's dimensionality, which reduces the total amount of parameters that need to be trained. The most common method is by using $2\times 2$ max-pooling layer. This is applied with stride 2 on the input volume, shrinking the output width and height by 2 and reducing the total output size to 25~\%. As the name implies, the outputof the filter is the maximum of the input values in the region as shown in Figure~\ref{fig:max_pooling}. Pooling retains the number of depth dimensions~\cite{cnnIntro}.
 
 \begin{figure}
   \begin{center}
@@ -207,10 +224,10 @@ A different way of shrinking the layers' spatial dimension are \textit{pooling l
   \end{center}
 \end{figure}
 
-\subsubsection{Fully-connected layers}
+\subsection{Fully-connected layers}
 The fully connected layers work just like they do in traditional neural networks, and are often placed at the end of a CNN network. This lets them compact all the data in the final volume into the final output of the network.
 
-\subsubsection{Common architectures}
+\subsection{Common architectures}
 Commonly a CNN is constructed by stacking pairs of convolutional and pooling layers, before finally ending with fully-connected layers. This convolutional outputs are passed through the rectifier activation function. Another common option is to have two convolution layers before the pooling layers. This is recommended since it allows the network to learn more complicated features. The general trend in the layer volume dimensions is that they become smaller but deeper towards the end of the network~\cite{cnnIntro}. For an illustration of a typical complete CNN architecture, see Figure~\ref{fig:typical_cnn}.
 
 \begin{figure}
@@ -222,22 +239,22 @@ Commonly a CNN is constructed by stacking pairs of convolutional and pooling lay
   \end{center}
 \end{figure}
 
-\subsubsection{Visualizing filters}
+\subsection{Visualizing filters}
 \textit{Gradient ascent in input space}
 \hl{TODO: Explain this as it's the source of visualizations}
 
 \section{Evaluation of classification systems}
-To evaluate a classification system an objective scoring method is needed. The most common method uses the two values \textit{precision} and \textit{recall}, together with the combined measure \textit{F1-score}. These can be calculated from the the number of true positives (TP), true negatives (TN), false positives (FP), and false negatives (FN).
+To evaluate a classification system an objective scoring method is needed. The most common method uses the two values \textit{precision} and \textit{recall}, together with the combined measure \textit{F1-score}. These can be calculated from the the number of true positives (TP), true negatives (TN), false positives (FP), and false negatives (FN). Precision and recall correspond to the medical terms \textit{specificity} and \textit{sensitivity}, respectively. Using these measures instead of the accuracy (the ratio of correct classifications) provides more information about what kinds of mistakes a model makes.
 
 \begin{table}[H]
   \begin{center}
     \begin{tabular}{cc}
       \textbf{Name} & \textbf{Meaning} \\
       \toprule
-      TP & Hits, count of correct identifications. \\
-      TN & Count of correct rejections. \\
-      FP & False alarms, count of incorrect identifications. \\
-      FN & Misses, count of incorrect rejections.
+      TP & Hits, number of correct identifications. \\
+      TN & Number of correct rejections. \\
+      FP & False alarms, number of incorrect identifications. \\
+      FN & Misses, number of incorrect rejections.
     \end{tabular}
   \end{center}
 \end{table}
@@ -286,7 +303,7 @@ OASIS-3 is a longitudinal neuroimaging dataset, with data collected over the cou
 \section{Labeling}
 I will use the assessment of the subjects' CDR score to label every MRI image with the stage of dementia. However, since OASIS-3 is a longitudinal study, the MRI scans and the clinical assessments were not performed at the same time. In fact, the time between MRI scans and the closest CDR assessment can be relatively large ($\mu=116$, $\sigma=107$). The distribution is shown in Figure~\ref{fig:mri_cdr_offset}. For most of the data the time from an MRI scan to the closest CDR assessment is less than 200 days, while for some images the delay can be several hundred days.
 
-To try to get reasonable CDR labels even when the time differences are high, a linear interpolation of the two closest CDR assessments considering the time of the MRI scan will be used when this is possible. If the MRI scan was done either before or after all of this subject's CDR assessments, the MRI scan will simply be tagged with the closest one.
+To try to get reasonable CDR labels even when the time differences are large, a linear interpolation of the two closest CDR assessments considering the time of the MRI scan will be used when this is possible. If the MRI scan was done either before or after all of this subject's CDR assessments, the MRI scan will be tagged with the closest one.
 
 This CDR calculation can be written as follows:
 \begin{flalign*}
@@ -312,12 +329,15 @@ Here $0 \leq x \leq 1$ is the interpolation factor between the two assessments c
 \end{figure}
 
 \section{Image extraction}
-During the preprocessing step the three image planes are extracted from each MRI scan. For simplicity the planes chosen are simply the middle one for each axis, and the raw intensity values from each scan are flattened into the normal black/white range of PNG images.
+During the preprocessing step the three image planes are extracted from each MRI scan. For simplicity the planes chosen are the middle one for each axis, and the raw intensity values from each scan are flattened into the normal black/white range of PNG images.
 
-Some scans are rotated the wrong way, even after realigning the images when loading. These images are simply skipped for now.
+Some MRI scans are rotated the wrong way, even after trying to orient them correctly using the metadata from the scan. These images are not corrected but instead skipped.
 
 \section{Dataset contents}
 The dataset in total contains 2782 images (ignoring the wrongly rotated ones). Of these images 20~\% were selected to be used as validation data, while the other 80~\% will be used to train the network. Since the network has never seen the validation data during training, it can be used to evaluate it's expected performance on unknown MRI images. Just as in the paper by \textcite{islam2018early} I will use the CDR scores to divide the images into four classes: \textit{non-demented}, \textit{very mild dementia}, \textit{mild dementia}, and \textit{moderate dementia}. These classes are not equally represented in the dataset, with the more serious dementia cases being much less frequent. The total count of each case is shown in Table~\ref{tab:dataset_contents}, with the count in training and verification broken out.
+
+\section{Hyperparameters}
+\hl{TODO: Learning rate, decay etc}
 
 \begin{table}[h]
   \begin{center}
@@ -364,7 +384,7 @@ Here the network will be trained with default training parameters, i.e. each sam
 \end{minipage}
 
 \subsection{Training with data augmentation}
-When the size of the datasize isn't too large, there is a risk of overfitting. One way to battle this is data augmentation, where the dataset is in some way extended. For this test the images will be mirrored along the along the sagittal axis (right side of the brain will become the left), to make the training data twice as large.
+When the size of the datasize is not too large, there is a risk of overfitting. One way to battle this is data augmentation, where the dataset is in some way extended. For this test the images will be mirrored along the along the sagittal axis (right side of the brain will become the left), to make the training data twice as large.
 
 \chapter{Results}
 
@@ -499,19 +519,28 @@ The learning rate of the Adam optimizer was found to be very important for good 
 Just as in the study by \textcite{islam2018early}, the low frequency of samples in the dataset showing progressed dementia is an issue. Thanks to OASIS-3 containing many times the number of MRI images as the original OASIS does, this is not too large of a problem during training, The low frequency is however very noticible during validation, when it results in single-digit counts of the rarest class (\textit{moderate dementia}). This gives very rough knowledge of how accurate the model actually is on this type of data. It might be useful to increase the ratio of validation to training data, and in the long term create new and larger datasets that enables researchers to evaluate their models' performance with more confidence. On the other hand, detecting these progressed cases of dementia might no be very useful in practice, since by then the symptoms will be so pronounced that the diagnosis can not be missed.
 
 \section{Method}
-It is debatable exactly what good performance is in computed-aided medical diagnostics. Is it important that the 
+It is debatable exactly what good performance is in the area of computed-aided medical diagnostics. Is it more important that the model does not miss any cases (minimize false negatives), or that the model does cause any false alarms (minimize false positives)? This is not obvious, but most likely the model should prioritize finding all cases of disease. If some false positives also occur that is fine, as long as the rate is low enough for the model to be useful.
 
 \section{Results}
 \subsection{Default training}
-When training without weighting the classes differently, the network starts out with an accuracy of just below 80~\%. The training data mostly contains images of cognitively normal brains, at a rate of $\frac{1724}{2162} \approx 79.7~\%$. This suggests that the network quickly learns to classify everything as this class, for a large and quick gain in accuracy which will just as quickly decrease the loss. Inspection of the output reveals that yes, this is actually the case the first few epochs. However, after training some more the network begins to try and also classify the other classes, managing a precision ranging from 30~\% to 50~\% on the three demented classifications. The accuracy steadily decreases as the classes get rarer, most likely because the loss function doesn't encourage exploration in order to get better on them. Since all input samples are weighted equally in the eyes of the loss function, performance on the ca.\ 20 images showing moderate dementia is worth 100 times less than the performance on the ca.\ \num{2000} images showing no dementia. If getting better on the rare classes means getting slightly worse on the dominating one, it won't happen.
+When training without weighting the classes differently, the network starts out with an accuracy of just below 80~\%. The training data mostly contains images of cognitively normal brains, at a rate of $\frac{1724}{2162} \approx 79.7~\%$. This suggests that the network quickly learns to classify everything as this class, for a large and quick gain in accuracy which will just as quickly decrease the loss. Inspection of the output reveals that yes, this is actually the case the first few epochs. However, after training some more the network begins to try and also classify the other classes, managing a precision ranging from 30~\% to 50~\% on the three demented classifications. The accuracy steadily decreases as the classes get rarer, most likely because the loss function does not encourage exploration in order to get better on them. Since all input samples are weighted equally in the eyes of the loss function, performance on the ca.\ 20 images showing moderate dementia is worth 100 times less than the performance on the ca.\ \num{2000} images showing no dementia. If getting better on the rare classes means getting slightly worse on the dominating one, it won't happen.
 
 \subsection{Class-weighted training}
+Weighting each class equally was very important for the most rare class, \textit{Moderate}. The precision on this group increased from $0.33$ to $1.0$, and the recall from $0.20$ to $0.60$. This happened at the same time as the performance on the other classes remained on a similar level. On the classes \textit{Very mild} and \textit{Mild} precision improved slightly at the same time as recall became slightly worse, while the opposite happened on the \textit{Non-demented} class. These changes were however very small, and not significant. In conclusion, class-weighting was important for the very rare class, but not as much for the moderately rare.
 
+If the dataset contains any rare classes, like OASIS-3 does, making sure to not disfavor them could be very important. These rare classes might be obvious, as they are here, but might also be hidden. For example, if a dataset mostly contains data collected from male subjects, a model could be biased during training and perform less well on female data, and vice versa. In cases like this 
+class-weighted training could be essential for fair healthcare.
 
 \subsection{Training with data augmentation}
 Why is this so disappointing? Bug or result
 
+\section{Future work}
+\hl{TODO: Write about the limitations of this study and future work.}
+
 \chapter{Conclusions}
+A convolutional neural network was found to be a powerful model for diagnosis of Alzheimer’s disease using MRI images. Even though this study's model was not very advanced, it still achieved decent performance on a problem that is very difficult for non-trained humans.
+
+The way the model was trained was found to be a very important factor of the network's performance. It was found to be especially important 
 
 \chapter{Acknowledgments}
 Data were provided by OASIS-3: Principal Investigators: T. Benzinger, D. Marcus, J. Morris; NIH P50AG00561, P30NS09857781, P01AG026276, P01AG003991, R01AG043434, UL1TR000448, R01EB009352. AV-45 doses were provided by Avid Radiopharmaceuticals, a wholly owned subsidiary of Eli Lilly.
