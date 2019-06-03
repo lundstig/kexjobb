@@ -284,7 +284,7 @@ This was done using a version of a convolutional neural network (CNN) trained on
 The CNN used by \textcite{islam2018early} uses a densely connected architecture that seems identical to DenseNet~\cite{huang2017densely}. DenseNet has implementations for both TensorFlow and PyTorch. A dense architecture means that each layer in the network is not just connected to the previous layer, but also to every other layer that came before it. This can speed up training and reduce overfitting by shrinking the parameter space and providing more direct connections between different parts of the network.
 
 \chapter{Methods}
-I will in this report evaluate three different strategies for training a convolutional neural network:
+This report will evaluate three different strategies for training a convolutional neural network:
 \begin{enumerate}
   \item Default training
   \item Training with equal weighting of the different classes (\textit{class-weighting})
@@ -293,16 +293,22 @@ I will in this report evaluate three different strategies for training a convolu
 
 These methods will be trained and evaluated using the OASIS-3 neuroimaging dataset~\cite{oasis}.
 
+The network will train for \num{1000} epochs (one epoch is one run through all training data) using each training regime, and the accuracy on the different classes will be measured. The study by Islam and Zhang resulted in a series of numerical values for accuracy, more specifically precision, recall, and f1 score. We will calculate the same values for our network trained on the larger dataset, to be able to compare our results with theirs. \hl{TODO: Compare with other studies as well.}
+
 \section{Training methods}
 \subsection{Default training}
 \textit{Default training} is the least sophisticated method, and is what would be used by someone who does not put any thought into how the training should work. This is what popular machine learning frameworks will provide by default, and will provide a performance baseline. The other two methods are meant to counter the problems the default training strategy might have in our use case.
 
 \subsection{Class-weighting}
+Like the original OASIS, OASIS-3 contains many times more images of patients without or with mild ALzheimer's disease as with more severe cases (see Section~\ref{dataset}). In the study by~\textcite{islam2017novel}, they tried to correct this by weighing each class equally in the error function, no matter how large part of the dataset each class actually represents. This will be the second training method tested, to see if this behaves as expectedly and improves the performance on the rarer classes.
 
 \subsection{Data augmentation}
+When the size of the dataset is not too large, there is a risk of overfitting. Overfitting is when the network `memorizes' the data used in the training set. This causes it to have very high performance and low error on the training data, while not being able to perform well in general which will be visible when testing on the validation data. One way to battle this is data augmentation, where the dataset is in some way extended. For this test the images will be mirrored along the along the sagittal axis (right side of the brain will become the left), as well as zooming the image in or out a random value less than 20~\%. This will in effect produce an infinite training data set (albeit quite similar), in theory making overfitting less likely.
 
-\section{OASIS-3 dataset}
-OASIS-3 is a longitudinal neuroimaging dataset, with data collected over the course of 30 years from 1098 participants in various projects. Of these participants 809 were cognitively normal adults, while 489 were at various stages of cognitive decline. Accompanying the neural imaging is (among other things) clinical assessments of cognitive function~\cite{oasis3}. I will use the T1-weighted brain scans and mental assessments which were done using the CDR system. The dataset in total contains 3393 T1-weighted MRI images and 4089 different CDR evaluations.
+\section{OASIS-3 dataset} \label{dataset}
+OASIS-3 is a longitudinal neuroimaging dataset, with data collected over the course of 30 years from 1098 adult participants from multiple studies. Of these participants 809 were cognitively normal, while 489 were at various stages of cognitive decline. Accompanying the neural imaging is (among other things) clinical assessments of cognitive function~\cite{oasis3}. I will use the T1-weighted brain scans and mental assessments which were done using the CDR system. The dataset in total contains 3393 T1-weighted MRI images and 4089 different CDR evaluations.
+
+The subset of the dataset that will be used contains 2782 images (see skipped images in Section~\ref{image_extraction}). Of these images 20~\% were selected to be used as validation data, while the other 80~\% will be used to train the network. Since the network has never seen the validation data during training, it can be used to evaluate its expected performance on unknown MRI images. Just as in the paper by \textcite{islam2018early} I will use the CDR scores to divide the images into four classes: \textit{non-demented}, \textit{very mild dementia}, \textit{mild dementia}, and \textit{moderate dementia}. These classes are not equally represented in the dataset, with the more serious dementia cases being much less frequent. The total count of each case is shown in Table~\ref{tab:dataset_contents}, with the count in training and verification broken out.
 
 \section{Labeling}
 I will use the assessment of the subjects' CDR score to label every MRI image with the stage of dementia. However, since OASIS-3 is a longitudinal study, the MRI scans and the clinical assessments were not performed at the same time. In fact, the time between MRI scans and the closest CDR assessment can be relatively large ($\mu=116$, $\sigma=107$). The distribution is shown in Figure~\ref{fig:mri_cdr_offset}. For most of the data the time from an MRI scan to the closest CDR assessment is less than 200 days, while for some images the delay can be several hundred days.
@@ -332,13 +338,12 @@ Here $0 \leq x \leq 1$ is the interpolation factor between the two assessments c
   \end{center}
 \end{figure}
 
-\section{Image extraction}
+\section{Image extraction} \label{image_extraction}
 During the preprocessing step the three image planes are extracted from each MRI scan. For simplicity the planes chosen are the middle one for each axis, and the raw intensity values from each scan are flattened into the normal black/white range of PNG images.
 
 Some MRI scans are rotated the wrong way, even after trying to orient them correctly using the metadata from the scan. These images are not corrected but instead skipped.
 
 \section{Dataset contents}
-The dataset in total contains 2782 images (ignoring the wrongly rotated ones). Of these images 20~\% were selected to be used as validation data, while the other 80~\% will be used to train the network. Since the network has never seen the validation data during training, it can be used to evaluate its expected performance on unknown MRI images. Just as in the paper by \textcite{islam2018early} I will use the CDR scores to divide the images into four classes: \textit{non-demented}, \textit{very mild dementia}, \textit{mild dementia}, and \textit{moderate dementia}. These classes are not equally represented in the dataset, with the more serious dementia cases being much less frequent. The total count of each case is shown in Table~\ref{tab:dataset_contents}, with the count in training and verification broken out.
 
 \section{Hyperparameters}
 \hl{TODO: Learning rate, decay etc}
@@ -359,25 +364,9 @@ The dataset in total contains 2782 images (ignoring the wrongly rotated ones). O
   \end{center}
 \end{table}
 
-% \setlength{\columnsep}{0pt}%
-% \setlength\intextsep{0mm}
-% \begin{wrapfigure}{r}{0.5\linewidth}
-%   % \adjustimage{width=.3\textwidth,left}{img/model.pdf}
-%   \includegraphics[width=0.9\linewidth]{img/model.pdf}
-% \end{wrapfigure}
-
 \begin{minipage}{.7\linewidth}
   \section{Network structure}
   The network this study is going to evaluate is mostly based on the basic CNN design suggested by \textcite{cnnIntro}, with double convolutional layers joined by pooling layers. The first two layers are taken from \textcite{islam2018early}, and consists of a convolutional layer with filters of size $7 \times 7$ and stride 2, followed by a pooling layer. All the other convolutional layers use filters of size $3 \times 3$. At the end of the network there are 128 fully connected neurons which finally connect into the four output neurons. Each output neuron represents the probability of each class. The densely connected layer also uses rectified linear activation, while the output layer uses softmax activation. The network is trained using the Adam optimizer, which is a variant of SGD, and the cross-entropy loss function.
-\\
-\section{Model iterations}
-A few different training methods for the CNN network will be tried out and evaluated. The network will train for \num{1000} epochs using each training regime, and the accuracy on the different classes will be measured. The study by Islam and Zhang resulted in a series of numerical values for accuracy, more specifically precision, recall, and f1 score. We will calculate the same values for our network trained on the larger dataset, and then compare our results with theirs. \hl{TODO: Compare with other studies as well.}
-
-\subsection{Default training}
-Here the network will be trained with default training parameters, i.e. each sample in the training input will be weighted equally in the loss function.
-
-\subsection{Class-weighted training}
-  Since the input data is very skewed, with some classes being much more represented than others, it might be a good idea to weight the classes to compensate for this, as done in the study by \textcite{islam2018early}. Now the total effect of each class on the loss will be the same. This will be used to see if the results improve.
 
 \end{minipage}
 \begin{minipage}{.3\linewidth}
@@ -386,9 +375,6 @@ Here the network will be trained with default training parameters, i.e. each sam
   \hspace*{0mm}
   \includegraphics[width=1.8\textwidth]{img/model.pdf}
 \end{minipage}
-
-\subsection{Training with data augmentation}
-When the size of the dataset is not too large, there is a risk of overfitting. One way to battle this is data augmentation, where the dataset is in some way extended. For this test the images will be mirrored along the along the sagittal axis (right side of the brain will become the left), to make the training data twice as large.
 
 \chapter{Results}
 
