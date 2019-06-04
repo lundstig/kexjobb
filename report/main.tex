@@ -102,17 +102,17 @@ The abnormal accumulation of two proteins (into what is called beta-amyloid plaq
 Brain atrophy occurs in a relatively late disease stage, when neurodegeneration has started to occur. This can be detected and measured using MRI imaging. Atrophy is a medically established predictor of an individual progressing from mild cognitive impairment to Alzheimer's disease. In addition, there seems to be a direct relationship between the severity of the atrophy and time-to-dementia. Brain atrophy is, however, not a unique sign of Alzheimer's but a measure of neural degeneration in general. Degeneration might be caused by other conditions~\cite{jack2010brain}.
 
 \subsection{Clinical dementia rating}
-Clinical dementia rating (CDR) is a score that is used to classify the stage of Alzheimer’s disease.
+Clinical dementia rating (CDR) is a score that is used to classify the stage of Alzheimer’s disease. Stages 0.0 through 2.0 is described in Table~\ref{tab:cdr_definition}. There also exists a final stage (3.0)~\cite{cdr}. This is not relevant to this study, as the disease in this stage is too severe to partake in medical studies.
 \begin{table}[h]
   \renewcommand{\arraystretch}{1.2}
   \begin{center}
     \caption{Clinical dementia rating}
     \label{tab:cdr_definition}
     \begin{tabular}{c|ll}
-      \textbf{Score} & \textbf{Class} & \textbf{Description} \\
+      \textbf{Score} & \textbf{Severity of AD} & \textbf{Description} \\
       \toprule
-      0.0 & Non-demented & Cognitively normal. \\
-      0.5 & Very mild & \hl{TODO} \\
+      0.0 & None & No systematic and \\
+      0.5 & Questionable & \hl{TODO} \\
       1.0 & Mild & \hl{TODO} \\
       2.0 & Moderate & \hl{TODO} \\
     \end{tabular}
@@ -280,36 +280,50 @@ This was done using a version of a convolutional neural network (CNN) trained on
 The CNN used by \textcite{islam2018early} uses a densely connected architecture that seems identical to DenseNet~\cite{huang2017densely}. DenseNet has implementations for both TensorFlow and PyTorch. A dense architecture means that each layer in the network is not just connected to the previous layer, but also to every other layer that came before it. This can speed up training and reduce overfitting by shrinking the parameter space and providing more direct connections between different parts of the network.
 
 \chapter{Methods}
-This report will evaluate three different strategies for training a convolutional neural network:
+This report will evaluate three different strategies for training a convolutional neural network. The structure of the CNN used is described in Section~\ref{network_structure}. This CNN was trained and evaluated using the OASIS-3 dataset, presented in Section~\ref{dataset}. The three training methods examined were:
 \begin{enumerate}
   \item Default training
   \item Training with equal weighting of the different classes (\textit{class-weighting})
   \item Training utilizing \textit{data augmentation}
 \end{enumerate}
 
-These methods will be trained and evaluated using the OASIS-3 neuroimaging dataset~\cite{oasis}.
-
-The network will train for \num{1000} epochs (one epoch is one run through all training data) using each training regime, and the accuracy on the different classes will be measured. The study by Islam and Zhang resulted in a series of numerical values for accuracy, more specifically precision, recall, and f1 score. We will calculate the same values for our network trained on the larger dataset, to be able to compare our results with theirs. \hl{TODO: Compare with other studies as well.}
+The network was trained for \num{1000} epochs (one epoch is one run through all training data) for the \textit{Default} and \textit{class-weighted} training regimes. The last training method using data augmentation was be allowed to run for \num{5000} epochs, since convergence was much slower. The accuracy on the different classes was measured for each method. Most similar studies report their performance using precision, recall, and f1 score. The same performance metrics will be used in this study, to make comparisons possible.
 
 \section{Training methods}
 \subsection{Default training}
 \textit{Default training} is the least sophisticated method, and is what would be used by someone who does not put any thought into how the training should work. This is what popular machine learning frameworks will provide by default, and will provide a performance baseline. The other two methods are meant to counter the problems the default training strategy might have in our use case.
 
 \subsection{Class-weighting}
-Like the original OASIS, OASIS-3 contains many times more images of patients without or with mild ALzheimer's disease as with more severe cases (see Section~\ref{dataset}). In the study by~\textcite{islam2017novel}, they tried to correct this by weighing each class equally in the error function, no matter how large part of the dataset each class actually represents. This will be the second training method tested, to see if this behaves as expectedly and improves the performance on the rarer classes.
+Like the original OASIS, OASIS-3 contains many times more images of patients without or with mild Alzheimer's disease as with more severe cases (see Section~\ref{dataset}). In the study by~\textcite{islam2017novel}, they tried to correct this by weighing each class equally in the error function, no matter how large part of the dataset each class actually represents. This will be the second training method tested, to see if data augmentation solves the issue of an imbalanced dataset and improves the performance on the rarer classes.
 
 \subsection{Data augmentation}
-When the size of the dataset is not too large, there is a risk of overfitting. Overfitting is when the network `memorizes' the data used in the training set. This causes it to have very high performance and low error on the training data, while not being able to perform well in general which will be visible when testing on the validation data. One way to battle this is data augmentation, where the dataset is in some way extended. For this test the images will be mirrored along the along the sagittal axis (right side of the brain will become the left), as well as zooming the image in or out a random value less than 20~\%. This will in effect produce an infinite training data set (albeit quite similar), in theory making overfitting less likely.
+When the size of the dataset is not too large, there is a risk of overfitting. Overfitting is when the network `memorizes' the data used in the training set. This causes it to have very high performance and low error on the training data, while not being able to perform well in general which will be visible when testing on the validation data. One way to battle this is data augmentation, where the dataset is in some way extended. For this test the images will be mirrored along the sagittal axis (right side of the brain will become the left), as well as zoomed in or out a random amount at most 20~\%. This will in effect produce an infinite training data set (albeit quite homogenous), in theory making overfitting less likely.
 
 \section{OASIS-3 dataset} \label{dataset}
 OASIS-3 is a longitudinal neuroimaging dataset, with data collected over the course of 30 years from 1098 adult participants from multiple studies. Of these participants 809 were cognitively normal, while 489 were at various stages of cognitive decline. Accompanying the neural imaging is (among other things) clinical assessments of cognitive function~\cite{oasis3}. I will use the T1-weighted brain scans and mental assessments which were done using the CDR system. The dataset in total contains 3393 T1-weighted MRI images and 4089 different CDR evaluations.
 
-The subset of the dataset that will be used contains 2782 images (see skipped images in Section~\ref{image_extraction}). Of these images 20~\% were selected to be used as validation data, while the other 80~\% will be used to train the network. Since the network has never seen the validation data during training, it can be used to evaluate its expected performance on unknown MRI images. Just as in the paper by \textcite{islam2018early} I will use the CDR scores to divide the images into four classes: \textit{non-demented}, \textit{very mild dementia}, \textit{mild dementia}, and \textit{moderate dementia}. These classes are not equally represented in the dataset, with the more serious dementia cases being much less frequent. The total count of each case is shown in Table~\ref{tab:dataset_contents}, with the count in training and verification broken out.
+The subset of the dataset that was used contains 2782 images (see skipped images in Section~\ref{image_extraction}). Of these images 20~\% were selected to be used as validation data, while the other 80~\% was used to train the network. Since the network has never seen the validation data during training, it can be used to evaluate its expected performance on unknown MRI images. Just as in the paper by \textcite{islam2018early}, the CDR scores were used to divide the images into four classes: \textit{non-demented}, \textit{very mild dementia}, \textit{mild dementia}, and \textit{moderate dementia}. These classes are not equally represented in the dataset, with the more serious dementia cases being much less frequent. The total count of each class is shown in Table~\ref{tab:dataset_contents}, together with the image count in the training and verification sets.
+
+\begin{table}[h]
+  \begin{center}
+    \caption{Count of images belonging to each class in the dataset.\label{tab:dataset_contents}}
+    \begin{tabular}{r|cccc}
+      \textbf{CDR Class} & \textbf{Total} & \textbf{Training set} & \textbf{Validation set} \\
+      \toprule
+      Non-demented (0.0) & 2162 & 1722 & 440 \\
+      Questionable (0.5) & 442 & 362 & 80 \\
+      Mild (1.0) & 152 & 121 & 31 \\
+      Moderate (2.0) & 22 & 17 & 5 \\
+      \bottomrule
+      \textbf{Sum} & 2778 & 2222 & 556 \\
+    \end{tabular}
+  \end{center}
+\end{table}
 
 \section{Labeling}
-I will use the assessment of the subjects' CDR score to label every MRI image with the stage of dementia. However, since OASIS-3 is a longitudinal study, the MRI scans and the clinical assessments were not performed at the same time. In fact, the time between MRI scans and the closest CDR assessment can be relatively large ($\mu=116$, $\sigma=107$). The distribution is shown in Figure~\ref{fig:mri_cdr_offset}. For most of the data the time from an MRI scan to the closest CDR assessment is less than 200 days, while for some images the delay can be several hundred days.
+The assessment of the subjects' CDR score was used to label every MRI image with the stage of dementia. However, since OASIS-3 is a longitudinal study, the MRI scans and the clinical assessments were not performed at the same time. In fact, the time between MRI scans and the closest CDR assessment can be relatively large ($\mu=116$, $\sigma=107$). The distribution is shown in Figure~\ref{fig:mri_cdr_offset}. For most of the data the time from an MRI scan to the closest CDR assessment is less than 200 days, while for some images the delay can be several hundred days.
 
-To try to get reasonable CDR labels even when the time differences are large, a linear interpolation of the two closest CDR assessments considering the time of the MRI scan will be used when this is possible. If the MRI scan was done either before or after all of this subject's CDR assessments, the MRI scan will be tagged with the closest one.
+To try to get reasonable CDR labels even when the time differences are large, a linear interpolation of the two closest CDR assessments considering the time of the MRI scan was used when this was possible. If the MRI scan was done either before or after all of this subject's CDR assessments, the MRI scan was tagged with the closest CDR value.
 
 This CDR calculation can be written as follows:
 \begin{flalign*}
@@ -335,33 +349,16 @@ Here $0 \leq x \leq 1$ is the interpolation factor between the two assessments c
 \end{figure}
 
 \section{Image extraction} \label{image_extraction}
-During the preprocessing step the three image planes are extracted from each MRI scan. For simplicity the planes chosen are the middle one for each axis, and the raw intensity values from each scan are flattened into the normal black/white range of PNG images.
+During the preprocessing step the image plane were extracted from each MRI scan. For simplicity the planes chosen are the middle one for each axis, and the raw intensity values from each scan are flattened into the normal black/white range of PNG images.
 
 Some MRI scans are rotated the wrong way, even after trying to orient them correctly using the metadata from the scan. These images are not corrected but instead skipped.
 
-\section{Dataset contents}
-
 \section{Hyperparameters}
-\hl{TODO: Learning rate, decay etc}
+As mentioned earlier the Adam optimizer was used. It was instantiated with a learning rate of $10^{-5}$, a beta$_1$ of $0.9$, a beta$_2$ of $0.999$, an epsilon of $10^{-7}$, and no weight decay. When training a batch size of $64$ was used.
 
-\begin{table}[h]
-  \begin{center}
-    \caption{Count of images belonging to each class in the dataset.\label{tab:dataset_contents}}
-    \begin{tabular}{r|cccc}
-      \textbf{CDR Class} & \textbf{Total} & \textbf{Training set} & \textbf{Validation set} \\
-      \toprule
-      Non-demented (0.0) & 2162 & 1722 & 440 \\
-      Very mild (0.5) & 442 & 362 & 80 \\
-      Mild (1.0) & 152 & 121 & 31 \\
-      Moderate (2.0) & 22 & 17 & 5 \\
-      \bottomrule
-      \textbf{Sum} & 2778 & 2222 & 556 \\
-    \end{tabular}
-  \end{center}
-\end{table}
 
 \begin{minipage}{.7\linewidth}
-  \section{Network structure}
+  \section{Network structure} \label{network_structure}
   The network this study is going to evaluate is mostly based on the basic CNN design suggested by \textcite{cnnIntro}, with double convolutional layers joined by pooling layers. The first two layers are taken from \textcite{islam2018early}, and consists of a convolutional layer with filters of size $7 \times 7$ and stride 2, followed by a pooling layer. All the other convolutional layers use filters of size $3 \times 3$. At the end of the network there are 128 fully connected neurons which finally connect into the four output neurons. Each output neuron represents the probability of each class. The densely connected layer also uses rectified linear activation, while the output layer uses softmax activation. The network is trained using the Adam optimizer, which is a variant of SGD, and the cross-entropy loss function.
 
 \end{minipage}
@@ -398,7 +395,7 @@ The learning rate of the Adam optimizer was found to be very important for good 
       \textbf{CDR Class} & \textbf{Precision} & \textbf{Recall} & \textbf{f1-Score} & \textbf{Support} \\
       \toprule
       Non-demented (0.0) & 0.88 & 0.91 & 0.89 & 440 \\
-      Very mild (0.5)    & 0.51 & 0.46 & 0.49 & 80  \\
+      Questionable (0.5) & 0.51 & 0.46 & 0.49 & 80  \\
       Mild (1.0)         & 0.40 & 0.32 & 0.36 & 31  \\
       Moderate (2.0)     & 0.33 & 0.20 & 0.25 & 5   \\
     \end{tabular}
@@ -426,7 +423,7 @@ The learning rate of the Adam optimizer was found to be very important for good 
       \textbf{CDR Class} & \textbf{Precision} & \textbf{Recall} & \textbf{f1-Score} & \textbf{Support} \\
       \toprule
       Non-demented (0.0) & 0.87 & 0.93 & 0.90 & 440 \\
-      Very mild (0.5)    & 0.52 & 0.41 & 0.46 & 80  \\
+      Questionable (0.5) & 0.52 & 0.41 & 0.46 & 80  \\
       Mild (1.0)         & 0.43 & 0.29 & 0.35 & 31  \\
       Moderate (2.0)     & 1.00 & 0.60 & 0.75 & 5   \\
     \end{tabular}
@@ -442,7 +439,7 @@ The learning rate of the Adam optimizer was found to be very important for good 
       \textbf{CDR Class} & \textbf{Precision} & \textbf{Recall} & \textbf{f1-Score} & \textbf{Support} \\
       \toprule
            Non-demented (0.0) &  0.91   &  0.77  &   0.83   &   440 \\
-           Very mild (0.5)    &  0.33   &  0.57  &   0.42   &    80 \\
+           Questionable (0.5) &  0.33   &  0.57  &   0.42   &    80 \\
            Mild (1.0)         &  0.40   &  0.55  &   0.46   &    31 \\
            Moderate (2.0)     &  0.67   &  0.40  &   0.50   &     5 \\
     \end{tabular}
@@ -487,7 +484,7 @@ It is debatable exactly what good performance is in the area of computed-aided m
 When training without weighting the classes differently, the network starts out with an accuracy of just below 80~\%. The training data mostly contains images of cognitively normal brains, at a rate of $\frac{1724}{2162} \approx 79.7~\%$. This suggests that the network quickly learns to classify everything as this class, for a large and quick gain in accuracy which will just as quickly decrease the loss. Inspection of the output reveals that yes, this is actually the case the first few epochs. However, after training some more the network begins to try and also classify the other classes, managing a precision ranging from 30~\% to 50~\% on the three demented classifications. The accuracy steadily decreases as the classes get rarer, most likely because the loss function does not encourage exploration in order to get better on them. Since all input samples are weighted equally in the eyes of the loss function, performance on the ca.\ 20 images showing moderate dementia is worth 100 times less than the performance on the ca.\ \num{2000} images showing no dementia. If getting better on the rare classes means getting slightly worse on the dominating one, it won't happen.
 
 \subsection{Class-weighted training}
-Weighting each class equally was very important for the most rare class, \textit{Moderate}. The precision on this group increased from $0.33$ to $1.0$, and the recall from $0.20$ to $0.60$. This happened at the same time as the performance on the other classes remained on a similar level. On the classes \textit{Very mild} and \textit{Mild} precision improved slightly at the same time as recall became slightly worse, while the opposite happened on the \textit{Non-demented} class. These changes were however very small, and not significant. In conclusion, class-weighting was important for the very rare class, but not as much for the moderately rare.
+Weighting each class equally was very important for the most rare class, \textit{Moderate}. The precision on this group increased from $0.33$ to $1.0$, and the recall from $0.20$ to $0.60$. This happened at the same time as the performance on the other classes remained on a similar level. On the classes \textit{Questionable} and \textit{Mild} precision improved slightly at the same time as recall became slightly worse, while the opposite happened on the \textit{Non-demented} class. These changes were however very small, and not significant. In conclusion, class-weighting was important for the very rare class, but not as much for the moderately rare.
 
 If the dataset contains any rare classes, like OASIS-3 does, making sure to not disfavor them could be very important. These rare classes might be obvious, as they are here, but might also be hidden. For example, if a dataset mostly contains data collected from male subjects, a model could be biased during training and perform less well on female data, and vice versa. In cases like this 
 class-weighted training could be essential for fair healthcare.
