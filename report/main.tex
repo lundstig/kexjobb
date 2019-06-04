@@ -241,10 +241,6 @@ Commonly a CNN is constructed by stacking pairs of convolutional and pooling lay
   \end{center}
 \end{figure}
 
-\subsection{Visualizing filters}
-\textit{Gradient ascent in input space}
-\hl{TODO: Explain this as it is the source of visualizations}
-
 \section{Evaluation of classification systems}
 To evaluate a classification system an objective scoring method is needed. The most common method uses the two values \textit{precision} and \textit{recall}, together with the combined measure \textit{F1-score}. These can be calculated from the the number of true positives (TP), true negatives (TN), false positives (FP), and false negatives (FN). Descriptions of these can be found in Table~\ref{tab:tp_mm}. Precision and recall correspond to the medical terms \textit{specificity} and \textit{sensitivity}, respectively. Using these measures instead of the accuracy (the ratio of correct classifications) provides more information about what kinds of mistakes a model makes.
 
@@ -464,31 +460,6 @@ The learning rate of the Adam optimizer was found to be very important for good 
   \includegraphics[width=0.9\linewidth]{img/accuracy_data_augmentation.pdf}
   \label{fig:accuracy_default}
   \caption{Accuracy during training with data augmentation.}
-\end{figure}
-
-\section{Filter visualizations}
-\begin{figure}[H]
-  \begin{subfigure}{.5\textwidth}
-    \centering
-    \includegraphics[width=0.9\linewidth]{img/layer0.png}
-    \label{fig:layer0}
-    \caption{Initial convolution}
-  \end{subfigure}%
-  \begin{subfigure}{.5\textwidth}
-    \centering
-    \includegraphics[width=0.9\linewidth]{img/layer1.png}
-    \label{fig:layer1}
-    \caption{Second convolution}
-  \end{subfigure}
-  \\[10pt]
-  \begin{subfigure}{1\textwidth}
-    \centering
-    \includegraphics[width=0.45\linewidth]{img/layer2.png}
-    \label{fig:layer2}
-    \caption{Third convolution}
-  \end{subfigure}
-  \label{fig:filtervis}
-  \caption{Selected filter visualizations from the first three convolution layers.}
 \end{figure}
 
 \section{Summary of training results}
