@@ -14,6 +14,7 @@
 \newcommand{\num}[1]{{#1}}
 \usepackage{soul}
 \usepackage{subcaption}
+\usepackage{tabularx}
 \usepackage{wrapfig}
 
 \addbibresource{references.bib} % The file containing our references, in BibTeX format
@@ -102,24 +103,25 @@ The abnormal accumulation of two proteins (into what is called beta-amyloid plaq
 Brain atrophy occurs in a relatively late disease stage, when neurodegeneration has started to occur. This can be detected and measured using MRI imaging. Atrophy is a medically established predictor of an individual progressing from mild cognitive impairment to Alzheimer's disease. In addition, there seems to be a direct relationship between the severity of the atrophy and time-to-dementia. Brain atrophy is, however, not a unique sign of Alzheimer's but a measure of neural degeneration in general. Degeneration might be caused by other conditions~\cite{jack2010brain}.
 
 \subsection{Clinical dementia rating}
-Clinical dementia rating (CDR) is a score that is used to classify the stage of Alzheimer’s disease. Stages 0.0 through 2.0 is described in Table~\ref{tab:cdr_definition}. There also exists a final stage (3.0)~\cite{cdr}. This is not relevant to this study, as the disease in this stage is too severe to partake in medical studies.
+Clinical dementia rating (CDR) is a score that is used to classify the stage of Alzheimer’s disease. Scores 0.0 through 2.0 is described in Table~\ref{tab:cdr_definition}. There also exists a final score of 3.0~\cite{cdr}. This score is not relevant to this study, as the disease in this stage is too severe to partake in medical studies.
+
+The CDR is derived from an interview with the patient as well as an informant, where impairment to six cognitive categories are scored: Memory, Orientation, Judgment and Problem Solving, Community Affairs, Home and Hobbies, and Personal Care. The final CDR score is a combination of all the categories, with \textit{Memory} being given extra weight~\cite{cdr}.
+
 \begin{table}[h]
   \renewcommand{\arraystretch}{1.2}
   \begin{center}
     \caption{Clinical dementia rating}
     \label{tab:cdr_definition}
-    \begin{tabular}{c|ll}
+    \begin{tabularx}{\textwidth}{c|cX}
       \textbf{Score} & \textbf{Severity of AD} & \textbf{Description} \\
       \toprule
-      0.0 & None & No systematic and \\
-      0.5 & Questionable & \hl{TODO} \\
-      1.0 & Mild & \hl{TODO} \\
-      2.0 & Moderate & \hl{TODO} \\
-    \end{tabular}
+      0.0 & None & No consistent forgetfulness. Cognitively normal. \\
+      0.5 & Questionable & Slight, 'benign` forgetfulness. Slight impairment to problem solving, social activities, and hobbies. Able to fully care for oneself. \\
+      1.0 & Mild & Moderate memory loss. More difficult chores and interests abonded. Moderate difficulty with time relationships. Need prompting for personal care. \\
+      2.0 & Moderate & Severe memory loss. New material learnt is rapidly lost. Usually disoriented to time, often to place. Requires assistance with dressing and hygiene. \\
+    \end{tabularx}
   \end{center}
 \end{table}
-
-\hl{TODO: How is it calculated?}
 
 \section{Artificial neural networks}
 Artificial neural networks (ANNs) are computational modeling tools inspired by the neural networks found in biology. ANNs exhibit several information processing characteristics which make them useful for modeling complex real-word problems, among them non-linearity, their ability to handle imprecise information, and their ability to generalize~\cite{ANNFundamentals}. A common machine learning task is \textit{classification}. Here the machine learning algorithm is presented with a dataset containing many data points, each having some number of features and an assigned class. The goal of the machine learning model is then to learn a mapping from features to class, such that the model can be applied to new data where the class is unknown. ANNs are often used successfully for this task, but they do have the drawback that the models are opaque, or in other words they can't reason about why they give the output that they do~\cite[p. 3, 8--9]{weiss1990empirical}.
