@@ -299,7 +299,7 @@ The network was trained for \num{1000} epochs (one epoch is one run through all 
 Like the original OASIS, OASIS-3 contains many times more images of patients without or with mild Alzheimer's disease as with more severe cases (see Section~\ref{dataset}). In the study by~\textcite{islam2017novel}, they tried to correct this by weighing each class equally in the error function, no matter how large part of the dataset each class actually represents. This will be the second training method tested, to see if data augmentation solves the issue of an imbalanced dataset and improves the performance on the rarer classes.
 
 \subsection{Data augmentation}
-When the size of the dataset is not too large, there is a risk of overfitting. Overfitting is when the network `memorizes' the data used in the training set. This causes it to have very high performance and low error on the training data, while not being able to perform well in general which will be visible when testing on the validation data. One way to battle this is data augmentation, where the dataset is in some way extended. For this test the images will be mirrored along the sagittal axis (right side of the brain will become the left), as well as zoomed in or out a random amount at most 20~\%. This will in effect produce an infinite training data set (albeit quite homogenous), in theory making overfitting less likely.
+When the size of the dataset is not too large, there is a risk of overfitting. Overfitting is when the network `memorizes' the data used in the training set. This causes it to have very high performance and low error on the training data, while not being able to perform well in general which will be visible when testing on the validation data. One way to battle this is data augmentation, where the dataset is in some way extended. For this test the images will be mirrored along the sagittal axis (right side of the brain will become the left), as well as zoomed in or out a random amount at most 20~\%. This will, in effect, produce an infinite training data set (albeit a quite homogenous one). This larger data set will in theory make overfitting less likely. However, this will not change the proportion of the training classes. When training, an image is selected from the original data set. This image is then used to create an augmented image, keeping which keeps the class ratio the same.
 
 \section{OASIS-3 dataset} \label{dataset}
 OASIS-3 is a longitudinal neuroimaging dataset, with data collected over the course of 30 years from 1098 adult participants from multiple studies. Of these participants 809 were cognitively normal, while 489 were at various stages of cognitive decline. Accompanying the neural imaging is (among other things) clinical assessments of cognitive function~\cite{oasis3}. I will use the T1-weighted brain scans and mental assessments which were done using the CDR system. The dataset in total contains 3393 T1-weighted MRI images and 4089 different CDR evaluations.
@@ -350,6 +350,10 @@ Here $0 \leq x \leq 1$ is the interpolation factor between the two assessments c
   \end{center}
 \end{figure}
 
+
+
+\begin{minipage}{.7\linewidth}
+\vspace*{-50mm}
 \section{Image extraction} \label{image_extraction}
 During the preprocessing step the image plane were extracted from each MRI scan. For simplicity the planes chosen are the middle one for each axis, and the raw intensity values from each scan are flattened into the normal black/white range of PNG images.
 
@@ -358,17 +362,20 @@ Some MRI scans are rotated the wrong way, even after trying to orient them corre
 \section{Hyperparameters}
 As mentioned earlier the Adam optimizer was used. It was instantiated with a learning rate of $10^{-5}$, a beta$_1$ of $0.9$, a beta$_2$ of $0.999$, an epsilon of $10^{-7}$, and no weight decay. When training a batch size of $64$ was used.
 
-
-\begin{minipage}{.7\linewidth}
-  \section{Network structure} \label{network_structure}
-  The network this study is going to evaluate is mostly based on the basic CNN design suggested by \textcite{cnnIntro}, with double convolutional layers joined by pooling layers. The first two layers are taken from \textcite{islam2018early}, and consists of a convolutional layer with filters of size $7 \times 7$ and stride 2, followed by a pooling layer. All the other convolutional layers use filters of size $3 \times 3$. At the end of the network there are 128 fully connected neurons which finally connect into the four output neurons. Each output neuron represents the probability of each class. The densely connected layer also uses rectified linear activation, while the output layer uses softmax activation. The network is trained using the Adam optimizer, which is a variant of SGD, and the cross-entropy loss function.
+\section{Network structure} \label{network_structure}
+  The network this study is going to evaluate is mostly based on the basic CNN design suggested by \textcite{cnnIntro}, with double convolutional layers joined by pooling layers. The first two layers are taken from \textcite{islam2018early}, and consists of a convolutional layer with filters of size $7 \times 7$ and stride 2, followed by a pooling layer. The sequence of layers can be seen in Figure~\ref{fig:network_structure}. All the other convolutional layers use filters of size $3 \times 3$. At the end of the network there are 128 fully connected neurons which finally connect into the four output neurons. Each output neuron represents the probability of each class. The densely connected layer also uses rectified linear activation, while the output layer uses softmax activation. The network is trained using the Adam optimizer, which is a variant of SGD, and the cross-entropy loss function.
 
 \end{minipage}
 \begin{minipage}{.3\linewidth}
   \centering
   \vspace*{-20mm}
   \hspace*{0mm}
-  \includegraphics[width=1.8\textwidth]{img/model.pdf}
+  \begin{figure}[H]
+      \includegraphics[width=1.7\textwidth]{img/model.pdf}
+      \vspace*{-13mm}
+      \caption{Diagram of the CNN used in this study.}
+      \label{fig:network_structure}
+  \end{figure}
 \end{minipage}
 
 \chapter{Results}

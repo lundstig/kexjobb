@@ -20,6 +20,7 @@ class_weighted = ax.bar(indices, p_class_weighted, width, label="Class-weighted"
 data_augmented = ax.bar(indices + width, p_data_augmented, width, label="Data augmentation")
 
 ax.set_ylabel('Precision')
+ax.set_ylim(0, 1)
 ax.set_title('Precision by training method, per CDR class')
 ax.set_xticks(indices)
 ax.set_xticklabels(('Non-demented', 'Very mild', 'Mild', 'Moderate'))
@@ -34,7 +35,8 @@ class_weighted = ax.bar(indices, r_class_weighted, width, label="Class-weighted"
 data_augmented = ax.bar(indices + width, r_data_augmented, width, label="Data augmentation")
 
 ax.set_ylabel('Precision')
-ax.set_title('Precision by training method, per CDR class')
+ax.set_ylim(0, 1)
+ax.set_title('Recall by training method, per CDR class')
 ax.set_xticks(indices)
 ax.set_xticklabels(('Non-demented', 'Very mild', 'Mild', 'Moderate'))
 ax.legend(loc='upper center')
