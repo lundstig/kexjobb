@@ -299,12 +299,26 @@ Three general solutions, along with more or less complicated variants, were eval
 Many studies exist describing systems classifying MRI images as either having Alzheimer's disease or not. Many different methods have been used, including linear support vector machines by \textcite{cuingnet2011automatic}, deep CNNs by \textcite{sarraf070441}, probability distribution functions by \textcite{beheshti2015probability}, as well as strateges combining MRI with multiple biomarkers and machine learning models such as the one by \textcite{zhang2011multimodal}.
 
 \subsubsection{Multi-class classification}
-\textcite{islam2018early} studied a variation Alzheimer's disease classification, where there are four different classes based on CDR scores, instead of just two. Their method was a variant of a CNN that they trained on the OASIS dataset~\cite{oasis}. Their CNN uses uses a densely connected architecture that seems identical to DenseNet~\cite{huang2017densely}. While their model showed acceptable performance for identifying non-demented patients, its performance on classifying demented patients was significantly worse, which they speculate could be because of the limited number of samples~\cite{islam2018early} in OASIS.
+\textcite{islam2018early} studied a variation of Alzheimer's disease classification, where classification is done into four different classes (based on CDR scores), instead of just two. Their method was a variant of a CNN that they trained on the OASIS dataset~\cite{oasis}. Their CNN uses uses a densely connected architecture that seems identical to DenseNet~\cite{huang2017densely}. While their model showed acceptable performance for identifying non-demented patients, its performance on classifying demented patients was significantly worse, which they speculate could be because of the limited number of samples~\cite{islam2018early} in OASIS\@. Their performance can be viewed in Table~\ref{tab:results_islam_zhang}.
+
+\begin{table}[H]
+  \begin{center}
+    \caption{Results by \textcite{islam2018early}. \label{tab:results_islam_zhang}}
+    \begin{tabular}{r|ccc|c}
+      \textbf{CDR Class} & \textbf{Precision} & \textbf{Recall} & \textbf{f1-Score} & \textbf{Support} \\
+      \toprule
+      Non-demented (0.0) & 0.99 & 0.99 & 0.99 & 73 \\
+      Questionable (0.5) & 0.75 & 0.50 & 0.60 & 6  \\
+      Mild (1.0)         & 0.62 & 0.71 & 0.67 & 7  \\
+      Moderate (2.0)     & 0.33 & 0.50 & 0.40 & 2   \\
+    \end{tabular}
+  \end{center}
+\end{table}
 
 \chapter{Methods} \label{methods}
-This report will evaluate three different strategies for training a convolutional neural network. The structure of the CNN used is described in Section~\ref{network_structure}. This CNN was trained and evaluated using the OASIS-3 dataset, presented in Section~\ref{dataset}. The three training methods examined were:
+This report will evaluate two different strategies for training a convolutional neural network, comparing them to a baseline. The structure of the CNN used is described in Section~\ref{network_structure}. This CNN was trained and evaluated using the OASIS-3 dataset, presented in Section~\ref{dataset}. The training methods examined were:
 \begin{enumerate}
-  \item Default training
+  \item Baseline
   \item Training with equal weighting of the different classes (\textit{class-weighting})
   \item Training utilizing \textit{data augmentation}
 \end{enumerate}
@@ -312,8 +326,8 @@ This report will evaluate three different strategies for training a convolutiona
 The network was trained for \num{1000} epochs (one epoch is one run through all training data) for the \textit{Default} and \textit{class-weighted} training regimes. The last training method using data augmentation was be allowed to run for \num{5000} epochs, since convergence was much slower. The accuracy on the different classes was measured for each method. Most similar studies report their performance using precision, recall, and f1 score. The same performance metrics will be used in this study, to make comparisons possible.
 
 \section{Training methods}
-\subsection{Default training}
-\textit{Default training} is the least sophisticated method, and is what would be used by someone who does not put any thought into how the training should work. This is what popular machine learning frameworks will provide by default, and will provide a performance baseline. The other two methods are meant to counter the problems the default training strategy might have in our use case.
+\subsection{Baseline}
+\textit{Baseline training} is the least sophisticated method, and is what would be used by someone who does not put any thought into how the training should work. This is what popular machine learning frameworks will provide by default, and will provide a performance baseline. The other two methods are meant to counter the problems the baseline training strategy might have in our use case.
 
 \subsection{Class-weighting}
 Like the original OASIS, OASIS-3 contains many times more images of patients without or with mild Alzheimer's disease as with more severe cases (see Section~\ref{dataset}). In the study by~\textcite{islam2017novel}, they tried to correct this by weighing each class equally in the error function, no matter how large part of the dataset each class actually represents. This will be the second training method tested, to see if data augmentation solves the issue of an imbalanced dataset and improves the performance on the rarer classes.
@@ -382,6 +396,8 @@ Some MRI scans are rotated the wrong way, even after trying to orient them corre
 \section{Hyperparameters}
 As mentioned earlier the Adam optimizer was used. It was instantiated with a learning rate of $10^{-5}$, a beta$_1$ of $0.9$, a beta$_2$ of $0.999$, an epsilon of $10^{-7}$, and no weight decay. When training a batch size of $64$ was used.
 
+Whn choosing hyperparameters, the learning rate of the Adam optimizer was found to be important. The default learning rate of $0.001$ appears to be to large, and results in the network not improving. A lower rate of $10^{-5}$ resulted in better and quicker results during training.
+
 \section{Network structure} \label{network_structure}
 The network this study is going to evaluate is mostly based on the basic CNN design suggested by \textcite{cnnIntro}, with double convolutional layers joined by pooling layers. The first two layers are taken from \textcite{islam2018early}, and consists of a convolutional layer with filters of size $7 \times 7$ and stride 2, followed by a pooling layer. The sequence of layers can be seen in Figure~\ref{fig:network_structure}. All the other convolutional layers use filters of size $3 \times 3$. At the end of the network there are 128 fully connected neurons which finally connect into the four output neurons. Each output neuron represents the probability of each class. The densely connected layer also uses rectified linear activation, while the output layer uses softmax activation. The network is trained using the Adam optimizer, which is a variant of SGD, and the cross-entropy loss function.
 
@@ -400,26 +416,12 @@ The network this study is going to evaluate is mostly based on the basic CNN des
 
 \chapter{Results}
 
-The learning rate of the Adam optimizer was found to be very important for good results. The default learning rate of $0.001$ appears to be to large, and resulted in the network not improving. A lower rate of $10^{-5}$ resulted in better and quicker results during training.
+For each of the two methods, in addition to the default baseline, the results will be presented as one table, and two diagrams. The table presents the precision, recall, and f1-score for each method on each class. The support column of the table shows the number of datapoints in each class.Then follows the two diagrams. The first shows the evolution of the loss function for both test and validation data during the training, on a logarithmic scale, while the other shows the evolution of the accuracy.
 
-\section{Default training}
-
-\begin{figure}
-  \centering
-  \includegraphics[width=0.9\linewidth]{img/loss_default.pdf}
-  \label{fig:loss_default}
-  \caption{Loss during training with the default training scheme.}
-\end{figure}
-\begin{figure}
-  \centering
-  \includegraphics[width=0.9\linewidth]{img/accuracy_default.pdf}
-  \label{fig:accuracy_default}
-  \caption{Accuracy during training with the default training scheme.}
-\end{figure}
-
+\section{Baseline}
 \begin{table}[H]
   \begin{center}
-    \caption{Results for default training. \label{tab:results_class_weighted}}
+    \caption{Baseline results. \label{tab:results_default}}
     \begin{tabular}{r|ccc|c}
       \textbf{CDR Class} & \textbf{Precision} & \textbf{Recall} & \textbf{f1-Score} & \textbf{Support} \\
       \toprule
@@ -430,19 +432,20 @@ The learning rate of the Adam optimizer was found to be very important for good 
     \end{tabular}
   \end{center}
 \end{table}
-\begin{figure}
+
+As can be seen in Table~\ref{tab:results_default}, the network achieves high performance on the \textit{Non-demented} class (f1-score of 0.89), but as the classes get rarer performance deteriorates. Especially bad is the recall, with a value of just $0.20$ on the \textit{Moderate} class. The validation loss, presented in Figure~\ref{fig:loss_default}, can be seen to quickly decrease together with the training loss, and then slowly start increasing while the training loss decreases. For the accuracy presented in Figure~\ref{fig:accuracy_default}, note the `bump' in accuracy at the beginning, and the following gap as test accuracy rises to $1$ while validation accuracy stays arund $0.80$.
+
+\begin{figure}[H]
   \centering
-  \includegraphics[width=0.9\linewidth]{img/loss_class_weighted.pdf}
-  \caption{Loss during training with class-weighting.}
-  \label{fig:loss_default}
-  \vspace{-30mm}
+  \includegraphics[width=0.9\linewidth]{img/loss_default.pdf}
+  \caption{Loss during training with the baseline training scheme.} \label{fig:loss_default}
 \end{figure}
-\begin{figure}
+\begin{figure}[H]
   \centering
-  \includegraphics[width=0.9\linewidth]{img/accuracy_class_weighted.pdf}
-  \label{fig:accuracy_default}
-  \caption{Accuracy during training with class-weighting.}
+  \includegraphics[width=0.9\linewidth]{img/accuracy_default.pdf}
+  \caption{Accuracy during training with the baseline training scheme.} \label{fig:accuracy_default}
 \end{figure}
+
 
 \section{Class-weighted training}
 \begin{table}[H]
@@ -459,6 +462,19 @@ The learning rate of the Adam optimizer was found to be very important for good 
   \end{center}
 \end{table}
 
+As can be seen in Table~\ref{tab:results_class_weighted}, the networks achieves high performance on the \textit{Non-demented} class (f1-score of 0.9). The model does not perform as well on the \textit{Questionable} class (f1-score of 0.46), and even worse on the \textit{Mild} class (f1-score of 0.32). Nevertheless, note the high performance of the \textit{Moderate} class (precision of $1.0$ and recall of $0.60$). The training and validation loss has a large gap, as can be seen in Figure~\ref{fig:loss_class_weighting}. The accuracy shown in Figure~\ref{fig:accuracy_class_weighting} starts out low, below the bottom of the diagram at $0.60$, but then increases. Training accuracy increases faster towards $1.0$, while validation accuracy more slowly plateaus at $0.80$.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\linewidth]{img/loss_class_weighted.pdf}
+  \caption{Loss during training with class-weighting.} \label{fig:loss_class_weighting}
+  \vspace{-30mm}
+\end{figure}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\linewidth]{img/accuracy_class_weighted.pdf}
+  \caption{Accuracy during training with class-weighting.} \label{fig:accuracy_class_weighting}
+\end{figure}
 
 \section{Training with data augmentation}
 \begin{table}[H]
@@ -475,31 +491,35 @@ The learning rate of the Adam optimizer was found to be very important for good 
   \end{center}
 \end{table}
 
-\begin{figure}
+The training and validation loss presented in Figure~\ref{fig:loss_data_augmentation} stick together relatively closly. Note also that the training accuracy in Figure~\ref{fig:accuracy_data_augmentation} does not reach $1.0$, instead following the validation accuracy without departing significantly.
+
+\begin{figure}[H]
   \centering
   \includegraphics[width=0.9\linewidth]{img/loss_data_augmentation.pdf}
-  \caption{Loss during training with data augmentation.}
-  \label{fig:loss_default}
+  \caption{Loss during training with data augmentation.} \label{fig:loss_data_augmentation}
 \end{figure}
-\begin{figure}
+\begin{figure}[H]
   \centering
   \includegraphics[width=0.9\linewidth]{img/accuracy_data_augmentation.pdf}
-  \label{fig:accuracy_default}
-  \caption{Accuracy during training with data augmentation.}
+  \caption{Accuracy during training with data augmentation.}\label{fig:accuracy_data_augmentation} 
 \end{figure}
 
 \section{Summary of training results}
+For easy visual comparison, the precision and recall for the three training methods on each class can be found in Figure~\ref{fig:precision_comparison} and Figure~\ref{fig:recall_comparison}, respectively.
+
+Class-weighting is seen to not decrease precision much on any class, while improving the precision significantly on the \textit{Moderate class}. Recall was found to deteriorate slightly on \textit{Very mild} and \textit{Mild} classes, while improving slightly on \textit{Non-demented} and significantly on \textit{Moderate}.
+
+Data augmentation increases precision on \textit{Non-demented} and \textit{Moderate} classes, while decreasing precision on the \textit{Very mild} class. Recall is decreased on \textit{Non-demented}, while increasing significantly for all the other three classes.
+
 \begin{figure}[H]
   \centering
   \includegraphics[width=0.8\linewidth]{img/precision_comparison.pdf}
-  \label{fig:precision_comparison}
-  \caption{Comparison of the precision resulting from the different training methods.}
+  \caption{Comparison of the precision resulting from the different training methods.} \label{fig:precision_comparison}
 \end{figure}
 \begin{figure}[H]
   \centering
   \includegraphics[width=0.8\linewidth]{img/recall_comparison.pdf}
-  \label{fig:recall_comparison}
-  \caption{Comparison of the recall resulting from the different training methods.}
+  \caption{Comparison of the recall resulting from the different training methods.} \label{fig:recall_comparison}
 \end{figure}
 
 \chapter{Discussion}
@@ -509,7 +529,7 @@ Just as in the study by \textcite{islam2018early}, the low frequency of samples 
 It is debatable exactly what good performance is in the area of computed-aided medical diagnostics. Is it more important that the model does not miss any cases (minimize false negatives), or that the model does cause any false alarms (minimize false positives)? This is not obvious, but most likely the model should prioritize finding all cases of disease. If some false positives also occur that is fine, as long as the rate is low enough for the model to be useful.
 
 \section{Results}
-\subsection{Default training}
+\subsection{Baseline training}
 When training without weighting the classes differently, the network starts out with an accuracy of just below 80~\%. The training data mostly contains images of cognitively normal brains, at a rate of $\frac{1724}{2162} \approx 79.7~\%$. This suggests that the network quickly learns to classify everything as this class, for a large and quick gain in accuracy which will just as quickly decrease the loss. Inspection of the output reveals that yes, this is actually the case the first few epochs. However, after training some more the network begins to try and also classify the other classes, managing a precision ranging from 30~\% to 50~\% on the three demented classifications. The accuracy steadily decreases as the classes get rarer, most likely because the loss function does not encourage exploration in order to get better on them. Since all input samples are weighted equally in the eyes of the loss function, performance on the ca.\ 20 images showing moderate dementia is worth 100 times less than the performance on the ca.\ \num{2000} images showing no dementia. If getting better on the rare classes means getting slightly worse on the dominating one, it won't happen.
 
 \subsection{Class-weighted training}
@@ -519,7 +539,7 @@ If the dataset contains any rare classes, like OASIS-3 does, making sure to not 
 class-weighted training could be essential for fair healthcare.
 
 \subsection{Training with data augmentation}
-Why is this so disappointing? Bug or result
+Looking at Table~\ref{fig:results_data_augmentation}, \textit{Non-demented} precision is high (0.91), but recall is lower (0.77). Precision on the \textit{Questionable}, \textit{Mild}, and \textit{Moderate} classes was low ($0.33$, $0.40$, and $0.67$ respectively) with recall being slightly higher ($0.57$, $0.55$, $0.40$ respectively).
 
 \section{Future work}
 \hl{TODO: Write about the limitations of this study and future work.}
