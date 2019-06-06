@@ -181,7 +181,7 @@ Because of this a variant of gradient descent named \textit{stochastic} gradient
 There is also a third option, \textit{mini-batch} gradient descent, which aims to combine the best of both batch and stochastic gradient descent. Here the gradient calculation is performed on \textit{mini-batches} of $n$ training examples. This can help by making the updates more stable, and also helps with utilizing optimized matrix libraries that enables quickly calculating the gradient for a mini-batch. This is the method typically used when training neural networks in practice, and the term SGD is usually used to refer to this method as well~\cite{gradient_descent}.
 
 \subsubsection{Adam optimizer}
-\textit{Adam} is another, more recent method for gradient-based optimization. Its hyperparameters (parameters that adjust how the optimization method works) are intuitive and require little tuning, at the same time as Adam has high efficiency. It compares favorably to other optimization methods, and is well-suited for use in  machine learning problems~\cite{adam}.
+\textit{Adam} is another, more recent method for gradient-based optimization. Its hyperparameters (parameters that adjust how the optimization method works) are intuitive and require little tuning, at the same time as Adam has high efficiency. It compares favorably to other optimization methods, and is well-suited for use in machine learning problems~\cite{adam}.
 
 \subsection{Learning rate}
 The learning rate is a parameter that determines how large steps should be taken when performing the gradient descent. Too large a learning rate, and the network will not converge. Too small, and the convergence will take too long. A common strategy is to keep decreasing the learning rate as training progresses~\cite{Bottou2012}.
@@ -274,14 +274,25 @@ The F1-score can be used to combine the precision and recall scores into a singl
 \[ F_1 = \frac{2PR}{P + R} \]
 
 \section{Previous work}
-\hl{TODO: Fill this in with more studies to compare to}
-\subsubsection{Islam and Zhang}
-Zhang and co.
-This was done using a version of a convolutional neural network (CNN) trained on the OASIS dataset \parencite{oasis}. While their model showed acceptable performance for identifying non-demented patients, its performance on classifying demented patients was significantly worse, which could be because of the limited number of samples.
+Studies focusing specifically on the effect of different training methods on neural networks, convolutional or otherwise, seems to be rare. This is especially true for the smaller subject of machine learning on medical images.
+What do exist, however, is \textit{guidelines} for how you should train networks in various scenarios, as well as studies where researches create and evaluate a specific CNN model. Three studies will be highlighted here: One for the case of medical images, one for the handling of imbalanced dataset, and finally one study which achieves high performance on classification of Alzheimer's disease.
 
-The CNN used by \textcite{islam2018early} uses a densely connected architecture that seems identical to DenseNet~\cite{huang2017densely}. DenseNet has implementations for both TensorFlow and PyTorch. A dense architecture means that each layer in the network is not just connected to the previous layer, but also to every other layer that came before it. This can speed up training and reduce overfitting by shrinking the parameter space and providing more direct connections between different parts of the network.
+\subsection{Training CNNs on medical images}
+In the book \citetitle{deepmedical}, suggestions for how to train machine learning models in the context of medical images are described. They suggest three general methods for improving learning: The use of rectified linear units (ReLU), dropout, and batch normalization~\cite[p. 20-22]{deepmedical} These will not be evaluated in this study, however ReLU units will be used in the CNN (see Section~\ref{methods}).
+In addition, \citetitle{deepmedical} highlights the usefulness of data augmentaion, where geometric transforms are applied to the training data in order to extend it. This is said to typically increase performance by about 3~\%~\cite[p. 31]{deepmedical}.
 
-\chapter{Methods}
+\subsection{Handling imbalanced datasets}
+Training of machine learning models for classification problems often suffers from imbalance in the dataset between the different classes. This is studied in \citetitle{more2016survey}, by \textcite{more2016survey}.
+
+Three general solutions, along with more or less complicated variants, were evaluated on a synthetic imblanaced dataset. The goal is to improve recall on the rare class, while not worsening the precision of the common class. First of the methods are \textit{class-weighting}, where the error function is modified to weigh each class equally, disregarding the relative sizes. Second is \textit{undersampling}, where samples of the common class are skipped when training. Finally there is \textit{oversampling}, where the rare class is made larger. On their dataset, a variant of oversampling called \textit{SMOTE} in combination with class-weighting was found to be the most effective. Granted that, the article also notes that the most effective method may vary depending on the data distribution~\cite{more2016survey}.
+
+\subsection{Classification of Alzheimer's disease}
+Many studies exist describing systems classifying MRI images as either having Alzheimer's disease or not. Many different methods have been used, including linear support vector machines by \textcite{cuingnet2011automatic}, deep CNNs by \textcite{sarraf070441}, probability distribution functions by \textcite{beheshti2015probability}, as well as strateges combining MRI with multiple biomarkers and machine learning models such as the one by \textcite{zhang2011multimodal}.
+
+\subsubsection{Multi-class classification}
+\textcite{islam2018early} studied a variation Alzheimer's disease classification, where there are four different classes based on CDR scores, instead of just two. This was done using a variant of a CNN trained on the OASIS dataset~\cite{oasis}. Their CNN uses uses a densely connected architecture that seems identical to DenseNet~\cite{huang2017densely}. While their model showed acceptable performance for identifying non-demented patients, its performance on classifying demented patients was significantly worse, which they speculate could be because of the limited number of samples~\cite{islam2018early} in OASIS.
+
+\chapter{Methods} \label{methods}
 This report will evaluate three different strategies for training a convolutional neural network. The structure of the CNN used is described in Section~\ref{network_structure}. This CNN was trained and evaluated using the OASIS-3 dataset, presented in Section~\ref{dataset}. The three training methods examined were:
 \begin{enumerate}
   \item Default training
@@ -299,7 +310,7 @@ The network was trained for \num{1000} epochs (one epoch is one run through all 
 Like the original OASIS, OASIS-3 contains many times more images of patients without or with mild Alzheimer's disease as with more severe cases (see Section~\ref{dataset}). In the study by~\textcite{islam2017novel}, they tried to correct this by weighing each class equally in the error function, no matter how large part of the dataset each class actually represents. This will be the second training method tested, to see if data augmentation solves the issue of an imbalanced dataset and improves the performance on the rarer classes.
 
 \subsection{Data augmentation}
-When the size of the dataset is not too large, there is a risk of overfitting. Overfitting is when the network `memorizes' the data used in the training set. This causes it to have very high performance and low error on the training data, while not being able to perform well in general which will be visible when testing on the validation data. One way to battle this is data augmentation, where the dataset is in some way extended. For this test the images will be mirrored along the sagittal axis (right side of the brain will become the left), as well as zoomed in or out a random amount at most 20~\%. This will, in effect, produce an infinite training data set (albeit a quite homogenous one). This larger data set will in theory make overfitting less likely. However, this will not change the proportion of the training classes. When training, an image is selected from the original data set. This image is then used to create an augmented image, keeping which keeps the class ratio the same.
+When the size of the dataset is not too large, there is a risk of overfitting. Overfitting is when the network `memorizes' the data used in the training set. This causes it to have very high performance and low error on the training data, while not being able to perform well in general which will be visible when testing on the validation data. One way to battle this is data augmentation, where the dataset is in some way extended. For this test the images will be mirrored along the sagittal axis (right side of the brain will become the left), as well as zoomed in or out a random amount at most 20~\%. This will, in effect, produce an infinite training dataset (albeit a quite homogenous one). This larger dataset will in theory make overfitting less likely. However, this will not change the proportion of the training classes. When training, an image is selected from the original dataset. This image is then used to create an augmented image, keeping which keeps the class ratio the same.
 
 \section{OASIS-3 dataset} \label{dataset}
 OASIS-3 is a longitudinal neuroimaging dataset, with data collected over the course of 30 years from 1098 adult participants from multiple studies. Of these participants 809 were cognitively normal, while 489 were at various stages of cognitive decline. Accompanying the neural imaging is (among other things) clinical assessments of cognitive function~\cite{oasis3}. I will use the T1-weighted brain scans and mental assessments which were done using the CDR system. The dataset in total contains 3393 T1-weighted MRI images and 4089 different CDR evaluations.
@@ -332,7 +343,7 @@ This CDR calculation can be written as follows:
   \begin{aligned}
     \text{cdr} &=
     \begin{cases}
-      \text{cdr}_{\text{next}}   & \text{if before all assessments} \\
+      \text{cdr}_{\text{next}} & \text{if before all assessments} \\
       \text{cdr}_{\text{prev}} & \text{if after all assessments} \\
       \text{cdr}_{\text{prev}} + x * (\text{cdr}_{\text{next}} - \text{cdr}_{\text{prev}}) & \text{otherwise} \\
     \end{cases} & \\[5pt]
@@ -363,7 +374,7 @@ Some MRI scans are rotated the wrong way, even after trying to orient them corre
 As mentioned earlier the Adam optimizer was used. It was instantiated with a learning rate of $10^{-5}$, a beta$_1$ of $0.9$, a beta$_2$ of $0.999$, an epsilon of $10^{-7}$, and no weight decay. When training a batch size of $64$ was used.
 
 \section{Network structure} \label{network_structure}
-  The network this study is going to evaluate is mostly based on the basic CNN design suggested by \textcite{cnnIntro}, with double convolutional layers joined by pooling layers. The first two layers are taken from \textcite{islam2018early}, and consists of a convolutional layer with filters of size $7 \times 7$ and stride 2, followed by a pooling layer. The sequence of layers can be seen in Figure~\ref{fig:network_structure}. All the other convolutional layers use filters of size $3 \times 3$. At the end of the network there are 128 fully connected neurons which finally connect into the four output neurons. Each output neuron represents the probability of each class. The densely connected layer also uses rectified linear activation, while the output layer uses softmax activation. The network is trained using the Adam optimizer, which is a variant of SGD, and the cross-entropy loss function.
+The network this study is going to evaluate is mostly based on the basic CNN design suggested by \textcite{cnnIntro}, with double convolutional layers joined by pooling layers. The first two layers are taken from \textcite{islam2018early}, and consists of a convolutional layer with filters of size $7 \times 7$ and stride 2, followed by a pooling layer. The sequence of layers can be seen in Figure~\ref{fig:network_structure}. All the other convolutional layers use filters of size $3 \times 3$. At the end of the network there are 128 fully connected neurons which finally connect into the four output neurons. Each output neuron represents the probability of each class. The densely connected layer also uses rectified linear activation, while the output layer uses softmax activation. The network is trained using the Adam optimizer, which is a variant of SGD, and the cross-entropy loss function.
 
 \end{minipage}
 \begin{minipage}{.3\linewidth}
