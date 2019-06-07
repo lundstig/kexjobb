@@ -7,8 +7,8 @@ r_default = (0.91, 0.46, 0.32, 0.20)
 p_class_weighted = (0.87, 0.52, 0.43, 1.0)
 r_class_weighted = (0.93, 0.41, 0.29, 0.60)
 
-p_data_augmented = (0.93, 0.32, 0.43, 0.50)
-r_data_augmented = (0.71, 0.75, 0.39, 0.40)
+p_data_augmented = (0.91, 0.33, 0.40, 0.67)
+r_data_augmented = (0.77, 0.57, 0.55, 0.40)
 
 indices = np.arange(len(p_default))
 width = 0.20
