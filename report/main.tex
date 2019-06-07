@@ -45,20 +45,22 @@
 \titlepage
 
 \begin{abstract}
-  English abstract goes here.
-  $$\int \gamma$$
+Effective computer diagnosis of Alzheimer's disease could bring large benefits to the millions of people worldwide who does or will suffer from dementia. One popular method for trying to achieve this is the training of convolutional neural networks to classify MRI brain scans. An abundance of training methods exists that aims to improve the performance of these neural networks, but their effectiveness and eventual disadvantages are not always clear.
+  
+This study evaluates the performance of a CNN on the OASIS-3 neuroimaging dataset. The CNN's task is to classify each MRI scan into one of four classes which correspond to the stage of Alzheimer's disease. Two different training methods are compared to a training baseline. The first method evaluated is class-weighting, a technique that tries to compensate for rare classes in imbalanced datasets. The second method is data augmentation, a technique that extends the dataset in an attempt to reduce overfitting and increase performance.
+  
+Class-weighting was found to improve the classification performance significantly on the rarest class, while not having too large effect on the other classes. Data augmentation was not found to improve performance in general, but did improve the recall on some classes.
 
 \end{abstract}
 
 
 \begin{otherlanguage}{swedish}
   \begin{abstract}
-    Träutensilierna i ett tryckeri äro ingalunda en oviktig faktor,
-    för trevnadens, ordningens och ekonomiens upprätthållande, och
-    dock är det icke sällan som sorgliga erfarenheter göras på grund
-    af det oförstånd med hvilket kaster, formbräden och regaler
-    tillverkas och försäljas Kaster som äro dåligt hopkomna och af
-    otillräckligt.
+    Effektiv datorbaserad diagnos av Alzheimers sjukdom skulle kunna medföra stora fördelar för de som lider av eller kommer drabbas av demens. En populär metod för att åstadkomma detta är tränandet av konvolutionella neurala nätverk (CNNs) som klassifierar magnetröntgenskanningar av hjärnan. Ett överflöd av träningsmetoder finns som försöker förbättra de här neurala nätverkens träffsäkerhet, men deras effektivitet och eventuella nackdelar är inte alltid tydliga.
+
+    Den här studen undersöker träffsäkerheten av ett CNN på hjärnavbildningsbanken OASIS-3. Nätverkets uppgift är att klassifiera varje MRI-bild som en av fyra klasser, whilka motsvar stadiet av Alzheimers sjukdom. Two olika träningsmetoder jämförs mot en grundmetod. Den första metoden som provas är klassviktning, en teknik som försöker kompensera för ovanliga klasser i en datamängd. Den andra metoden är datautökning, en teknik som utökar datamängded i ett försök att minska överträning och öka träffsäkerheten
+
+    Klassviktning visades tydligt öka klassifieringträffsäkerheten på den ovanligaste klassen, utan att ha alltför stor effekt på säkerheten för de andra klasserna. Datautökning ökade inte träffsäkerheten generallt, men förbättrade täckningen på vissa klasser.
   \end{abstract}
 \end{otherlanguage}
 
@@ -87,7 +89,7 @@ Choosing the correct way of training a CNN can have a significant impact on the 
 These methods tries to solve different problems and can each be applied independently to an existing model. They can be useful for all kinds of CNNs, but this study will focus on their effects on Alzheimer's diagnosis using MRI imaging. To this end, a simple CNN will be created, and its performance will be assessed when training, first without any of these methods, then with \textit{class-weighting}, and finally with \textit{data augmentation} and class-weighting. The following questions will be answered:
 
 \begin{itemize}
-\item{Does class-weighting improve the performance of rarer classes?}
+\item{Does class-weighting improve the performance on rarer classes?}
 \item{Does data augmentation improve general performance?}
 \end{itemize}
 
@@ -125,7 +127,7 @@ The CDR is derived from an interview with the patient as well as an informant, w
       \textbf{Score} & \textbf{Severity of AD} & \textbf{Description} \\
       \toprule
       0.0 & None & No consistent forgetfulness. Cognitively normal. \\
-      0.5 & Questionable & Slight, 'benign` forgetfulness. Slight impairment to problem solving, social activities, and hobbies. Able to fully care for oneself. \\
+      0.5 & Very mild & Slight, 'benign` forgetfulness. Slight impairment to problem solving, social activities, and hobbies. Able to fully care for oneself. \\
       1.0 & Mild & Moderate memory loss. More difficult chores and interests abonded. Moderate difficulty with time relationships. Need prompting for personal care. \\
       2.0 & Moderate & Severe memory loss. New material learnt is rapidly lost. Usually disoriented to time, often to place. Requires assistance with dressing and hygiene. \\
     \end{tabularx}
@@ -308,7 +310,7 @@ Many studies exist describing systems classifying MRI images as either having Al
       \textbf{CDR Class} & \textbf{Precision} & \textbf{Recall} & \textbf{f1-Score} & \textbf{Support} \\
       \toprule
       Non-demented (0.0) & 0.99 & 0.99 & 0.99 & 73 \\
-      Questionable (0.5) & 0.75 & 0.50 & 0.60 & 6  \\
+      Very mild (0.5) & 0.75 & 0.50 & 0.60 & 6  \\
       Mild (1.0)         & 0.62 & 0.71 & 0.67 & 7  \\
       Moderate (2.0)     & 0.33 & 0.50 & 0.40 & 2   \\
     \end{tabular}
@@ -323,7 +325,7 @@ This report will evaluate two different strategies for training a convolutional 
   \item Training utilizing \textit{data augmentation}
 \end{enumerate}
 
-The network was trained for \num{1000} epochs (one epoch is one run through all training data) for the \textit{Default} and \textit{class-weighted} training regimes. The last training method using data augmentation was be allowed to run for \num{5000} epochs, since convergence was much slower. The accuracy on the different classes was measured for each method. Most similar studies report their performance using precision, recall, and f1 score. The same performance metrics will be used in this study, to make comparisons possible.
+The network was trained for \num{1000} epochs (one epoch is one run through all training data) for the \textit{Default} and \textit{class-weighted} training regimes. The last training method using data augmentation was allowed to run for \num{5000} epochs, since convergence was much slower. The accuracy on the different classes were measured for each method. Most similar studies report their performance using precision, recall, and f1 score. The same performance metrics will be used in this study, both for their inherent usefulness and to make comparisons possible.
 
 \section{Training methods}
 \subsection{Baseline}
@@ -347,7 +349,7 @@ The subset of the dataset that was used contains 2782 images (see skipped images
       \textbf{CDR Class} & \textbf{Total} & \textbf{Training set} & \textbf{Validation set} \\
       \toprule
       Non-demented (0.0) & 2162 & 1722 & 440 \\
-      Questionable (0.5) & 442 & 362 & 80 \\
+      Very mild (0.5) & 442 & 362 & 80 \\
       Mild (1.0) & 152 & 121 & 31 \\
       Moderate (2.0) & 22 & 17 & 5 \\
       \bottomrule
@@ -426,14 +428,16 @@ For each of the two methods, in addition to the default baseline, the results wi
       \textbf{CDR Class} & \textbf{Precision} & \textbf{Recall} & \textbf{f1-Score} & \textbf{Support} \\
       \toprule
       Non-demented (0.0) & 0.88 & 0.91 & 0.89 & 440 \\
-      Questionable (0.5) & 0.51 & 0.46 & 0.49 & 80  \\
+      Very mild (0.5) & 0.51 & 0.46 & 0.49 & 80  \\
       Mild (1.0)         & 0.40 & 0.32 & 0.36 & 31  \\
       Moderate (2.0)     & 0.33 & 0.20 & 0.25 & 5   \\
     \end{tabular}
   \end{center}
 \end{table}
 
-As can be seen in Table~\ref{tab:results_default}, the network achieves high performance on the \textit{Non-demented} class (f1-score of 0.89), but as the classes get rarer performance deteriorates. Especially bad is the recall, with a value of just $0.20$ on the \textit{Moderate} class. The validation loss, presented in Figure~\ref{fig:loss_default}, can be seen to quickly decrease together with the training loss, and then slowly start increasing while the training loss decreases. For the accuracy presented in Figure~\ref{fig:accuracy_default}, note the `bump' in accuracy at the beginning, and the following gap as test accuracy rises to $1$ while validation accuracy stays arund $0.80$.
+As can be seen in Table~\ref{tab:results_default}, the network achieves high performance on the \textit{Non-demented} class (f1-score of 0.89), but as the classes get rarer performance deteriorates. Especially bad is the recall, with a value of just $0.20$ on the \textit{Moderate} class.
+
+The validation loss, presented in Figure~\ref{fig:loss_default}, can be seen to quickly decrease together with the training loss, and then slowly start increasing while the training loss decreases. For the accuracy presented in Figure~\ref{fig:accuracy_default}, note the `bump' in accuracy at the beginning, and the following gap as test accuracy rises to $1$ while validation accuracy stays arund $0.80$.
 
 \begin{figure}[H]
   \centering
@@ -455,20 +459,21 @@ As can be seen in Table~\ref{tab:results_default}, the network achieves high per
       \textbf{CDR Class} & \textbf{Precision} & \textbf{Recall} & \textbf{f1-Score} & \textbf{Support} \\
       \toprule
       Non-demented (0.0) & 0.87 & 0.93 & 0.90 & 440 \\
-      Questionable (0.5) & 0.52 & 0.41 & 0.46 & 80  \\
+      Very mild (0.5) & 0.52 & 0.41 & 0.46 & 80  \\
       Mild (1.0)         & 0.43 & 0.29 & 0.35 & 31  \\
       Moderate (2.0)     & 1.00 & 0.60 & 0.75 & 5   \\
     \end{tabular}
   \end{center}
 \end{table}
 
-As can be seen in Table~\ref{tab:results_class_weighted}, the networks achieves high performance on the \textit{Non-demented} class (f1-score of 0.9). The model does not perform as well on the \textit{Questionable} class (f1-score of 0.46), and even worse on the \textit{Mild} class (f1-score of 0.32). Nevertheless, note the high performance of the \textit{Moderate} class (precision of $1.0$ and recall of $0.60$). The training and validation loss has a large gap, as can be seen in Figure~\ref{fig:loss_class_weighting}. The accuracy shown in Figure~\ref{fig:accuracy_class_weighting} starts out low, below the bottom of the diagram at $0.60$, but then increases. Training accuracy increases faster towards $1.0$, while validation accuracy more slowly plateaus at $0.80$.
+As can be seen in Table~\ref{tab:results_class_weighted}, the networks achieves high performance on the \textit{Non-demented} class (f1-score of 0.9). The model does not perform as well on the \textit{Very mild} class (f1-score of 0.46), and even worse on the \textit{Mild} class (f1-score of 0.32). Nevertheless, note the high performance of the \textit{Moderate} class (precision of $1.0$ and recall of $0.60$).
+
+The training and validation loss has a large gap, as can be seen in Figure~\ref{fig:loss_class_weighting}. The accuracy shown in Figure~\ref{fig:accuracy_class_weighting} starts out low, below the bottom of the diagram at $0.60$, but then increases. Training accuracy increases faster towards $1.0$, while validation accuracy more slowly plateaus at $0.80$.
 
 \begin{figure}[H]
   \centering
   \includegraphics[width=0.9\linewidth]{img/loss_class_weighted.pdf}
   \caption{Loss during training with class-weighting.} \label{fig:loss_class_weighting}
-  \vspace{-30mm}
 \end{figure}
 \begin{figure}[H]
   \centering
@@ -477,6 +482,7 @@ As can be seen in Table~\ref{tab:results_class_weighted}, the networks achieves 
 \end{figure}
 
 \section{Training with data augmentation}
+
 \begin{table}[H]
   \begin{center}
     \caption{Results with data augmentation. \label{tab:results_data_augmentation}}
@@ -484,12 +490,14 @@ As can be seen in Table~\ref{tab:results_class_weighted}, the networks achieves 
       \textbf{CDR Class} & \textbf{Precision} & \textbf{Recall} & \textbf{f1-Score} & \textbf{Support} \\
       \toprule
            Non-demented (0.0) &  0.91   &  0.77  &   0.83   &   440 \\
-           Questionable (0.5) &  0.33   &  0.57  &   0.42   &    80 \\
+           Very mild (0.5) &  0.33   &  0.57  &   0.42   &    80 \\
            Mild (1.0)         &  0.40   &  0.55  &   0.46   &    31 \\
            Moderate (2.0)     &  0.67   &  0.40  &   0.50   &     5 \\
     \end{tabular}
   \end{center}
 \end{table}
+
+Looking at Table~\ref{tab:results_data_augmentation}, \textit{Non-demented} precision is high (0.91), but recall is lower (0.77). Precision on the \textit{Very mild}, \textit{Mild}, and \textit{Moderate} classes was low ($0.33$, $0.40$, and $0.67$ respectively) with recall being slightly higher ($0.57$, $0.55$, and $0.40$ respectively).
 
 The training and validation loss presented in Figure~\ref{fig:loss_data_augmentation} stick together relatively closly. Note also that the training accuracy in Figure~\ref{fig:accuracy_data_augmentation} does not reach $1.0$, instead following the validation accuracy without departing significantly.
 
@@ -509,7 +517,7 @@ For easy visual comparison, the precision and recall for the three training meth
 
 Class-weighting is seen to not decrease precision much on any class, while improving the precision significantly on the \textit{Moderate class}. Recall was found to deteriorate slightly on \textit{Very mild} and \textit{Mild} classes, while improving slightly on \textit{Non-demented} and significantly on \textit{Moderate}.
 
-Data augmentation increases precision on \textit{Non-demented} and \textit{Moderate} classes, while decreasing precision on the \textit{Very mild} class. Recall is decreased on \textit{Non-demented}, while increasing significantly for all the other three classes.
+Data augmentation increases precision slightly on the \textit{Non-demented} class, while decreasing precision heavily on the \textit{Very mild} and \textit{Moderate} classes. Recall is decreased on \textit{Non-demented} and \textit{Moderate}, while increasing for the other two classes.
 
 \begin{figure}[H]
   \centering
@@ -523,31 +531,49 @@ Data augmentation increases precision on \textit{Non-demented} and \textit{Moder
 \end{figure}
 
 \chapter{Discussion}
-Just as in the study by \textcite{islam2018early}, the low frequency of samples in the dataset showing progressed dementia is an issue. Thanks to OASIS-3 containing many times the number of MRI images as the original OASIS does, this is not too large of a problem during training, The low frequency is however very noticeable during validation, when it results in single-digit counts of the rarest class (\textit{moderate dementia}). This gives very rough knowledge of how accurate the model actually is on this type of data. It might be useful to increase the ratio of validation to training data, and in the long term create new and larger datasets that enables researchers to evaluate their models' performance with more confidence. On the other hand, detecting these progressed cases of dementia might no be very useful in practice, since by then the symptoms will be so pronounced that the diagnosis can not be missed.
 
 \section{Method}
-It is debatable exactly what good performance is in the area of computed-aided medical diagnostics. Is it more important that the model does not miss any cases (minimize false negatives), or that the model does cause any false alarms (minimize false positives)? This is not obvious, but most likely the model should prioritize finding all cases of disease. If some false positives also occur that is fine, as long as the rate is low enough for the model to be useful.
+It is debatable exactly what good performance is in the area of computer-aided medical diagnostics. Is it more important that the model does not miss any cases of disease (minimize false negatives), or that the model does cause any false alarms (minimize false positives)? Aditionally, in multi-class classification like the one performed here, are some classes more important than others? This is not obvious, but most likely the model should prioritize finding all cases of disease. If some false positives also occur that is fine, as long as the rate is low enough for the model to be useful. For Alzheimer's diagnosis, the most interesting class is probably \textit{Very mild}. Diagnosis of this class would bring the most benefit to patients, as the disease is still not very apparent and in an early stage.
+
+Just as in the study by \textcite{islam2018early}, the low frequency of samples in the dataset showing progressed dementia is an issue. Thanks to OASIS-3 containing many times the number of MRI images as the original OASIS does, this is not as large of a problem during training, with all classes having a a decent amount of images (maybe besides \textit{Moderate}, which only has 22). The low frequency is however very noticeable during validation, when it results in single-digit counts of the rarest class \textit{Moderate}. This gives very rough knowledge of how accurate the model actually is on this type of data, as a single extra correct classifition increases recall by $0.20$. To combat this it might have been useful to increase the ratio of validation to training data, for more stable results. On the other hand, detecting these progressed cases of dementia might no be very useful in practice, since by then the symptoms will be so pronounced that diagnosis using MRI scanning is not required. In the long term it would be beneficial if new and larger datasets were created, that would both give more training data and enable researchers to evaluate their models' performance with more confidence.
+
+The exact CNN model and hyperparameters used was assumed to not have any effect on the relative performance of the different training methods. However, this is just a guess, and might not be true. One must consider the possibility that other network structures and hyperparameters might benefit more or less from the two training methods.
 
 \section{Results}
 \subsection{Baseline training}
-When training without weighting the classes differently, the network starts out with an accuracy of just below 80~\%. The training data mostly contains images of cognitively normal brains, at a rate of $\frac{1724}{2162} \approx 79.7~\%$. This suggests that the network quickly learns to classify everything as this class, for a large and quick gain in accuracy which will just as quickly decrease the loss. Inspection of the output reveals that yes, this is actually the case the first few epochs. However, after training some more the network begins to try and also classify the other classes, managing a precision ranging from 30~\% to 50~\% on the three demented classifications. The accuracy steadily decreases as the classes get rarer, most likely because the loss function does not encourage exploration in order to get better on them. Since all input samples are weighted equally in the eyes of the loss function, performance on the ca.\ 20 images showing moderate dementia is worth 100 times less than the performance on the ca.\ \num{2000} images showing no dementia. If getting better on the rare classes means getting slightly worse on the dominating one, it won't happen.
+When training without weighting the classes differently, the network starts out with an accuracy of just below 80~\%. The training data mostly contains images of cognitively normal brains, at a rate of $\frac{1724}{2162} \approx 79.7~\%$. This suggests that the network quickly learns to classify everything as this class, for a large and quick gain in accuracy which will just as quickly decrease the loss. Inspection of the output reveals that yes, this is actually the case the first few epochs. However, after training some more the network begins to try and also classify the other classes, managing a precision ranging from 30~\% to 50~\% on the three demented classifications. The accuracy steadily decreases as the classes get rarer, most likely because the loss function does not encourage exploration in order to get better on them. Since all input samples are weighted equally in the eyes of the loss function, performance on the ca.\ 20 images showing moderate dementia is worth 100 times less than the performance on the ca.\ \num{2000} images showing no dementia. If getting better on the rare classes means getting slightly worse on the dominating one, improvement is not likely. Overfitting seems to be a large problem, with the network quickly reaching 100~\% accuracy on the training data, with nowhere near as good results on the validation set.
 
 \subsection{Class-weighted training}
-Weighting each class equally was very important for the most rare class, \textit{Moderate}. The precision on this group increased from $0.33$ to $1.0$, and the recall from $0.20$ to $0.60$. This happened at the same time as the performance on the other classes remained on a similar level. On the classes \textit{Questionable} and \textit{Mild} precision improved slightly at the same time as recall became slightly worse, while the opposite happened on the \textit{Non-demented} class. These changes were however very small, and not significant. In conclusion, class-weighting was important for the very rare class, but not as much for the moderately rare.
+Weighting each class equally was very important for the most rare class, \textit{Moderate}. The precision on this group increased from $0.33$ to $1.0$, and the recall from $0.20$ to $0.60$. This happened at the same time as the performance on the other classes remained on a similar, slightly higher level, besides on the \textit{Non-demented} class. These decrease was however very small, and not significant. In conclusion, class-weighting was important for the precision of the very rare class, but not as much for the moderately rare.
 
-If the dataset contains any rare classes, like OASIS-3 does, making sure to not disfavor them could be very important. These rare classes might be obvious, as they are here, but might also be hidden. For example, if a dataset mostly contains data collected from male subjects, a model could be biased during training and perform less well on female data, and vice versa. In cases like this 
-class-weighted training could be essential for fair healthcare.
+The recall was also found to improve significantly on the \textit{Moderate} class, as well as increasing slightly on the \textit{Non-demented} class. Interestingly, recall decreased on the \textit{Very mild} and \textit{Mild} classes, despite increased recall on rare classes being one of the main supposed benefits of class-weighting. Perhaps these classes are not rare enough, with only the \textit{Moderate} class being rare enough to improve, or maybe the method simply doesn't work that well on this dataset. Overfitting is still a problem, with training validation reaching 100~\%.
+
+In general, if the dataset contains any rare classes like the \textit{Moderate} class, making sure to not disfavor them could be very important. These rare classes might be obvious, as they are here, but might also be hidden. For example, if a dataset mostly contains data collected from male subjects, a model could be biased during training and perform less well on female data, and vice versa. In cases like this class-weighted training could be essential for fairness.
 
 \subsection{Training with data augmentation}
-Looking at Table~\ref{fig:results_data_augmentation}, \textit{Non-demented} precision is high (0.91), but recall is lower (0.77). Precision on the \textit{Questionable}, \textit{Mild}, and \textit{Moderate} classes was low ($0.33$, $0.40$, and $0.67$ respectively) with recall being slightly higher ($0.57$, $0.55$, $0.40$ respectively).
+The results when using data augmentation need to be compared to the class-weighted results, since the data augmentation was used on top of the class-weighting. At a first glance, the results were to my surprise not very impressive. The network still showed signs of overfitting, albeit not as much, and performance did not consistently improve. This suggests that data augmentation is not a universal solution, and other adjustments should be considered to combat overfitting
+
+Precision improveded slightly on \textit{Non-demented}, but at the same time recall decreased significantly which is not desirable. The performance \textit{Moderate} decreased heavily, with both precision and recall dropping. The two classes that did improve with data augmentation, interestingly, were \textit{Very mild} and \textit{Mild}. The precision on \textit{Very mild} dropped from $0.52$ to $0.33$, but on the other hand recall increased from $0.29$ to $0.55$. Recall improved similarly on \textit{Mild}, from $0.29$ to $0.55$ but without the precision decreasing.
+
+Despite the regression of \textit{Very mild} precision, I think these changes would be beneficial in a pracical application. In a practical application these low severity classes would be the ones which the scan would try to detect. In this situation, the lower precision is outweighed by more instances being detected, thanks to the higher recall.
 
 \section{Future work}
-\hl{TODO: Write about the limitations of this study and future work.}
+This study does not provide a definite guide for how to train a CNN on medical imaging. There exists a multitude of different ways to perform the training process, and only two were examined here. A more thorough evaluation of how to effectively train CNNs would be very useful in the development of future application.
+
+In addition, this study only used a single CNN structure. Different structures might perform differently, and react differently to various training schemes. An exploration of what, if any, effect the CNN structure has on the efficiency of the two training methods this report focsed on would be needed to know if this studies results hold in general.
 
 \chapter{Conclusions}
-A convolutional neural network was found to be a powerful model for diagnosis of Alzheimer’s disease using MRI images. Even though this study's model was not very advanced, it still achieved decent performance on a problem that is very difficult for non-trained humans.
+A convolutional neural network was found to be a powerful model for diagnosis of Alzheimer’s disease using MRI images. Even though this study's CNN was not very advanced or developed for maximum performance, it still achieved decent performance on a problem that is difficult for non-trained humans. The way the model was trained was found to be an important factor of the network's performance.
 
-The way the model was trained was found to be a very important factor of the network's performance. It was found to be especially important 
+\subsubsection{Does class-weighting improve the performance on rarer classes?}
+This study finds that class-weighting brings clear performances improvements on the rarest class, tripling both precision and recall on the OASIS-3 dataset. This happens without worsening perfomance on the most common class. Performance on the two semi-rare classes did not see such performance improvements, with precision increasing only slightly and recall in fact decreasing slightly.
+
+\subsubsection{Does data augmentation improve general performance?}
+Data augmentation was not found to increase performance in general. Despite this, the recall on the two semi-rare classes was found to improve significantly, without at the same time hurting precision overly so. Data augmentation can however be done in many ways, so this result may not hold in general.
+
+\subsubsection*{}
+To conclude, both class-weighting and data augmentation were found to be useful techniques, but with some caveats. Their application does not guarantee universal performance improvements, instead increasing and reducing performance to various degrees on different parts of the dataset. As such their usefulness will have to be evaluated on a case-by-case basis for each application.
+
 
 \chapter{Acknowledgments}
 Data were provided by OASIS-3: Principal Investigators: T. Benzinger, D. Marcus, J. Morris; NIH P50AG00561, P30NS09857781, P01AG026276, P01AG003991, R01AG043434, UL1TR000448, R01EB009352. AV-45 doses were provided by Avid Radiopharmaceuticals, a wholly owned subsidiary of Eli Lilly.
