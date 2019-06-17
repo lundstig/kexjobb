@@ -5,7 +5,7 @@ import json
 total_sessions = 0
 sessions = []
 data_dir = 'data/'
-auth = ('***REMOVED***', '***REMOVED***')
+auth = ('', '')
 cookies = {}
 headers = {}
 
